@@ -59,7 +59,7 @@ export default function Home() {
     const token = localStorage.getItem('token')
     if (!token) return navigate('/login')
     const q = Math.max(1, Number(qty[itemId] || 1))
-    const res = await fetch('http://localhost:5000/api/cart/add', {
+    const res = await fetch(`${API_BASE}/api/cart/add`, {
       method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
       body: JSON.stringify({ itemId, quantity: q })
     })

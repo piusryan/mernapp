@@ -179,11 +179,11 @@ export default function Items() {
                         if (!ok) return
                         const t = localStorage.getItem('token')
                         if (!t) return navigate('/login')
-                        const res = await fetch(`http://localhost:5000/api/admin/items/${it._id}`, { method:'DELETE', headers: { Authorization: `Bearer ${t}` } })
+                        const res = await fetch(`${API_BASE}/api/admin/items/${it._id}`, { method:'DELETE', headers: { Authorization: `Bearer ${t}` } })
                         if (res.status === 401) { localStorage.removeItem('token'); return navigate('/login') }
                         const data = await res.json()
                         if (!res.ok) return alert(data.error || 'Delete failed')
-                        const url = query ? `http://localhost:5000/api/items?q=${encodeURIComponent(query)}` : 'http://localhost:5000/api/items'
+                        const url = query ? `${API_BASE}/api/items?q=${encodeURIComponent(query)}` : `${API_BASE}/api/items`
                         fetch(url).then((r)=>r.json()).then(setItems).catch(()=>{})
                       }}>Delete</button>
                       <div style={{ marginTop: 8, display: 'flex', gap: 6 }}>
@@ -219,7 +219,7 @@ export default function Items() {
                           const t = localStorage.getItem('token')
                           if (!t) return navigate('/login')
                           const body = editing[it._id]
-                          const res = await fetch(`http://localhost:5000/api/admin/items/${it._id}`, {
+                          const res = await fetch(`${API_BASE}/api/admin/items/${it._id}`, {
                             method:'PUT',
                             headers: { 'Content-Type':'application/json', Authorization: `Bearer ${t}` },
                             body: JSON.stringify(body)
@@ -228,7 +228,7 @@ export default function Items() {
                           const data = await res.json()
                           if (!res.ok) return alert(data.error || 'Update failed')
                           setEditing((p)=>({ ...p, [it._id]: null }))
-                          const url = query ? `http://localhost:5000/api/items?q=${encodeURIComponent(query)}` : 'http://localhost:5000/api/items'
+                          const url = query ? `${API_BASE}/api/items?q=${encodeURIComponent(query)}` : `${API_BASE}/api/items`
                           fetch(url).then((r)=>r.json()).then(setItems).catch(()=>{})
                         }}>Save</button>
                         <button className="btn-modern" onClick={()=>setEditing((p)=>({ ...p, [it._id]: null }))}>Cancel</button>
@@ -269,13 +269,13 @@ export default function Items() {
                             onClick={async ()=>{
                               const t = localStorage.getItem('token')
                               if (!t) return navigate('/login')
-                              const del = await fetch(`http://localhost:5000/api/admin/reviews/${r._id}`, { method: 'DELETE', headers: { Authorization: `Bearer ${t}` } })
+                              const del = await fetch(`${API_BASE}/api/admin/reviews/${r._id}`, { method: 'DELETE', headers: { Authorization: `Bearer ${t}` } })
                               if (del.status === 401) { localStorage.removeItem('token'); return navigate('/login') }
                               if (!del.ok) { const dd = await del.json(); return alert(dd.error || 'Delete failed') }
-                              const r2 = await fetch(`http://localhost:5000/api/items/${it._id}/reviews`)
+                              const r2 = await fetch(`${API_BASE}/api/items/${it._id}/reviews`)
                               const d2 = await r2.json()
                               setReviews((p)=>({ ...p, [it._id]: d2 }))
-                              const url = query ? `http://localhost:5000/api/items?q=${encodeURIComponent(query)}` : 'http://localhost:5000/api/items'
+                              const url = query ? `${API_BASE}/api/items?q=${encodeURIComponent(query)}` : `${API_BASE}/api/items`
                               fetch(url).then((r)=>r.json()).then(setItems).catch(()=>{})
                             }}
                           >
@@ -339,11 +339,11 @@ export default function Items() {
                         if (!ok) return
                         const t = localStorage.getItem('token')
                         if (!t) return navigate('/login')
-                        const res = await fetch(`http://localhost:5000/api/admin/items/${it._id}`, { method:'DELETE', headers: { Authorization: `Bearer ${t}` } })
+                        const res = await fetch(`${API_BASE}/api/admin/items/${it._id}`, { method:'DELETE', headers: { Authorization: `Bearer ${t}` } })
                         if (res.status === 401) { localStorage.removeItem('token'); return navigate('/login') }
                         const data = await res.json()
                         if (!res.ok) return alert(data.error || 'Delete failed')
-                        const url = query ? `http://localhost:5000/api/items?q=${encodeURIComponent(query)}` : 'http://localhost:5000/api/items'
+                        const url = query ? `${API_BASE}/api/items?q=${encodeURIComponent(query)}` : `${API_BASE}/api/items`
                         fetch(url).then((r)=>r.json()).then(setItems).catch(()=>{})
                       }}>Delete</button>
                       <div style={{ marginTop: 8, display: 'flex', gap: 6 }}>
@@ -379,7 +379,7 @@ export default function Items() {
                           const t = localStorage.getItem('token')
                           if (!t) return navigate('/login')
                           const body = editing[it._id]
-                          const res = await fetch(`http://localhost:5000/api/admin/items/${it._id}`, {
+                          const res = await fetch(`${API_BASE}/api/admin/items/${it._id}`, {
                             method:'PUT',
                             headers: { 'Content-Type':'application/json', Authorization: `Bearer ${t}` },
                             body: JSON.stringify(body)
@@ -388,7 +388,7 @@ export default function Items() {
                           const data = await res.json()
                           if (!res.ok) return alert(data.error || 'Update failed')
                           setEditing((p)=>({ ...p, [it._id]: null }))
-                          const url = query ? `http://localhost:5000/api/items?q=${encodeURIComponent(query)}` : 'http://localhost:5000/api/items'
+                          const url = query ? `${API_BASE}/api/items?q=${encodeURIComponent(query)}` : `${API_BASE}/api/items`
                           fetch(url).then((r)=>r.json()).then(setItems).catch(()=>{})
                         }}>Save</button>
                         <button className="btn-modern" onClick={()=>setEditing((p)=>({ ...p, [it._id]: null }))}>Cancel</button>
@@ -429,13 +429,13 @@ export default function Items() {
                             onClick={async ()=>{
                               const t = localStorage.getItem('token')
                               if (!t) return navigate('/login')
-                              const del = await fetch(`http://localhost:5000/api/admin/reviews/${r._id}`, { method: 'DELETE', headers: { Authorization: `Bearer ${t}` } })
+                              const del = await fetch(`${API_BASE}/api/admin/reviews/${r._id}`, { method: 'DELETE', headers: { Authorization: `Bearer ${t}` } })
                               if (del.status === 401) { localStorage.removeItem('token'); return navigate('/login') }
                               if (!del.ok) { const dd = await del.json(); return alert(dd.error || 'Delete failed') }
-                              const r2 = await fetch(`http://localhost:5000/api/items/${it._id}/reviews`)
+                              const r2 = await fetch(`${API_BASE}/api/items/${it._id}/reviews`)
                               const d2 = await r2.json()
                               setReviews((p)=>({ ...p, [it._id]: d2 }))
-                              const url = query ? `http://localhost:5000/api/items?q=${encodeURIComponent(query)}` : 'http://localhost:5000/api/items'
+                              const url = query ? `${API_BASE}/api/items?q=${encodeURIComponent(query)}` : `${API_BASE}/api/items`
                               fetch(url).then((r)=>r.json()).then(setItems).catch(()=>{})
                             }}
                           >
@@ -494,11 +494,11 @@ export default function Items() {
                     if (!ok) return
                     const t = localStorage.getItem('token')
                     if (!t) return navigate('/login')
-                    const res = await fetch(`http://localhost:5000/api/admin/items/${it._id}`, { method:'DELETE', headers: { Authorization: `Bearer ${t}` } })
+                    const res = await fetch(`${API_BASE}/api/admin/items/${it._id}`, { method:'DELETE', headers: { Authorization: `Bearer ${t}` } })
                     if (res.status === 401) { localStorage.removeItem('token'); return navigate('/login') }
                     const data = await res.json()
                     if (!res.ok) return alert(data.error || 'Delete failed')
-                    const url = query ? `http://localhost:5000/api/items?q=${encodeURIComponent(query)}` : 'http://localhost:5000/api/items'
+                    const url = query ? `${API_BASE}/api/items?q=${encodeURIComponent(query)}` : `${API_BASE}/api/items`
                     fetch(url).then((r)=>r.json()).then(setItems).catch(()=>{})
                   }}>Delete</button>
                 </div>
@@ -529,7 +529,7 @@ export default function Items() {
                       const t = localStorage.getItem('token')
                       if (!t) return navigate('/login')
                       const body = editing[it._id]
-                      const res = await fetch(`http://localhost:5000/api/admin/items/${it._id}`, {
+                      const res = await fetch(`${API_BASE}/api/admin/items/${it._id}`, {
                         method:'PUT',
                         headers: { 'Content-Type':'application/json', Authorization: `Bearer ${t}` },
                         body: JSON.stringify(body)
@@ -538,7 +538,7 @@ export default function Items() {
                       const data = await res.json()
                       if (!res.ok) return alert(data.error || 'Update failed')
                       setEditing((p)=>({ ...p, [it._id]: null }))
-                      const url = query ? `http://localhost:5000/api/items?q=${encodeURIComponent(query)}` : 'http://localhost:5000/api/items'
+                      const url = query ? `${API_BASE}/api/items?q=${encodeURIComponent(query)}` : `${API_BASE}/api/items`
                       fetch(url).then((r)=>r.json()).then(setItems).catch(()=>{})
                     }}>Save</button>
                     <button className="btn-modern" onClick={()=>setEditing((p)=>({ ...p, [it._id]: null }))}>Cancel</button>
@@ -577,13 +577,13 @@ export default function Items() {
                           onClick={async ()=>{
                             const t = localStorage.getItem('token')
                             if (!t) return navigate('/login')
-                            const del = await fetch(`http://localhost:5000/api/admin/reviews/${r._id}`, { method: 'DELETE', headers: { Authorization: `Bearer ${t}` } })
+                            const del = await fetch(`${API_BASE}/api/admin/reviews/${r._id}`, { method: 'DELETE', headers: { Authorization: `Bearer ${t}` } })
                             if (del.status === 401) { localStorage.removeItem('token'); return navigate('/login') }
                             if (!del.ok) { const dd = await del.json(); return alert(dd.error || 'Delete failed') }
-                            const r2 = await fetch(`http://localhost:5000/api/items/${it._id}/reviews`)
+                            const r2 = await fetch(`${API_BASE}/api/items/${it._id}/reviews`)
                             const d2 = await r2.json()
                             setReviews((p)=>({ ...p, [it._id]: d2 }))
-                            const url = query ? `http://localhost:5000/api/items?q=${encodeURIComponent(query)}` : 'http://localhost:5000/api/items'
+                            const url = query ? `${API_BASE}/api/items?q=${encodeURIComponent(query)}` : `${API_BASE}/api/items`
                             fetch(url).then((r)=>r.json()).then(setItems).catch(()=>{})
                           }}
                         >
