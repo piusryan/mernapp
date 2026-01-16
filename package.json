@@ -1,0 +1,53 @@
+{
+  "name": "mernapp",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^13.5.0",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^9.0.1",
+    "react": "^19.2.1",
+    "react-dom": "^19.2.1",
+    "react-router-dom": "^7.10.1",
+    "react-scripts": "5.0.1",
+    "web-vitals": "^2.1.4"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.11"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "server": "node backend/index.js",
+    "server:dev": "nodemon backend/index.js",
+    "dev": "powershell -NoProfile -Command \"$env:JWT_SECRET='aj-dev-secret'; Start-Process -WindowStyle Hidden -FilePath 'npm' -ArgumentList 'run','server:dev'; npm start\"",
+    "aj": "powershell -NoProfile -Command \"$env:MONGO_URI='mongodb+srv://pius5april_db_user:DWipvYmlZN7A86TG@cluster0.hs6srmd.mongodb.net/mernapp?retryWrites=true&w=majority'; $env:JWT_SECRET='aj-dev-secret'; Remove-Item Env:SMTP_DISABLE -ErrorAction Ignore; $env:SMTP_USER='yoy181099@gmail.com'; $env:SMTP_PASS='ezktzkfywkipxudy'; Start-Process -WindowStyle Hidden -FilePath 'npm' -ArgumentList 'run','dev' -WorkingDirectory 'backend'; npm start\"",
+    "start:prod": "powershell -NoProfile -Command \"npm run build; $env:JWT_SECRET='aj-dev-secret'; node backend/index.js\"",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
