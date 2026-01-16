@@ -37,7 +37,7 @@ $env:SMTP_USER='yoy181099@gmail.com'; `
 $env:SMTP_PASS='ezktzkfywkipxudy'; `
 npm run dev
 //(in piowershell)
-
+JWT_SECRET = 7wmc1xrwr9yz9sdywka1mlc0buwd2qzn
 npm start
 //terminal
 
