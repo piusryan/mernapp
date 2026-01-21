@@ -74,13 +74,6 @@ export default function Login() {
             </div>
           </div>
           <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 10 }}>
-              <GoogleLogin
-                onSuccess={handleGoogleSuccess}
-                onError={() => setError('Google Login Failed')}
-                useOneTap
-              />
-            </div>
             {mode === 'login' ? (
               <>
                 <input className="auth-input" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} />
