@@ -1,6 +1,6 @@
 body {
   font-family: Arial, sans-serif;
-  background-image: url('http://localhost:5000/site-assets/plain.jpg');
+  background-image: url('./plain.jpg');
   background-size: cover;
   background-position: center;
   padding: 10px;
