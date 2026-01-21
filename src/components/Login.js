@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react'
 import '../home.css'
 import { API_BASE } from '../api'
 import { useNavigate } from 'react-router-dom'
-import { GoogleLogin } from '@react-oauth/google'
 
 export default function Login() {
   const [mode, setMode] = useState('login') // 'login' | 'register'
