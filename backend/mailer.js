@@ -18,6 +18,15 @@ function buildTransport() {
       port,
       secure,
       auth: user && pass ? { user, pass } : undefined,
+      tls: {
+        ciphers: 'SSLv3',
+        rejectUnauthorized: false
+      },
+      connectionTimeout: 60000, // 60 seconds
+      greetingTimeout: 30000, // 30 seconds
+      socketTimeout: 60000, // 60 seconds
+      debug: true, // Show handshake logs
+      logger: true // Log to console
     })
   }
 
