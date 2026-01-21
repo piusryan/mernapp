@@ -1,45 +1,44 @@
-const sgMail = require('@sendgrid/mail')
+const { Resend } = require('resend')
 
-function getTransport() {
-  if (process.env.SMTP_DISABLE === '1') return null
-  const apiKey = process.env.SENDGRID_API_KEY
-  if (!apiKey) {
-    console.warn('[mail] SENDGRID_API_KEY is missing')
+let resendClient = null
+
+function getResend() {
+  if (resendClient) return resendClient
+  const key = process.env.RESEND_API_KEY
+  if (!key) {
+    console.warn('[mail] RESEND_API_KEY is missing')
     return null
   }
-  sgMail.setApiKey(apiKey)
-  return sgMail
+  resendClient = new Resend(key)
+  return resendClient
 }
 
 async function sendOtpEmail(to, otp) {
-  const mailer = getTransport()
-  if (!mailer) {
-    console.log(`[mail] Disabled/Missing Key. OTP for ${to}: ${otp}`)
+  const resend = getResend()
+  if (!resend) {
+    console.log(`[mail] Resend Disabled. OTP for ${to}: ${otp}`)
     return
   }
 
-  const from = process.env.EMAIL_FROM || process.env.SMTP_USER // Fallback, but SendGrid needs a verified sender
-  if (!from) {
-    console.error('[mail] EMAIL_FROM env var is missing (required for SendGrid)')
-    return
-  }
-
-  const msg = {
-    to,
-    from,
-    subject: 'Your OTP Code',
-    text: `Your OTP is ${otp}. It expires in 10 minutes.`,
-    html: `<p>Your OTP is <b>${otp}</b>.</p><p>It expires in 10 minutes.</p>`,
-  }
-
+  // Resend requires a verified domain or "onboarding@resend.dev" if testing
+  // We use the env var or default to the test email for now
+  const from = process.env.EMAIL_FROM || 'onboarding@resend.dev'
+  
   try {
-    await mailer.send(msg)
-    console.log(`[mail] Sent OTP to ${to}`)
-  } catch (error) {
-    console.error('[mail] SendGrid OTP Error:', error)
-    if (error.response) {
-      console.error(error.response.body)
+    const { data, error } = await resend.emails.send({
+      from,
+      to,
+      subject: 'Your OTP Code',
+      html: `<p>Your OTP is <b>${otp}</b>.</p><p>It expires in 10 minutes.</p>`
+    })
+
+    if (error) {
+      console.error('[mail] Resend OTP Error:', error)
+      return
     }
+    console.log(`[mail] Sent OTP to ${to} (ID: ${data.id})`)
+  } catch (err) {
+    console.error('[mail] Resend Exception:', err)
   }
 }
 
@@ -48,33 +47,18 @@ function formatItems(items) {
 }
 
 async function sendOrderEmail(to, order, mode) {
-  const mailer = getTransport()
+  const resend = getResend()
   const isUpdate = mode && mode !== 'confirmed'
   const subject = isUpdate ? `Your order ${order._id} is ${mode}` : `Order confirmation ${order._id}`
   const intro = isUpdate ? `Good news! Your order is now ${mode}.` : `Thanks for your purchase! We've received your order.`
   
-  if (!mailer) {
-    console.log(`[mail] Disabled/Missing Key. Order email for ${to}`)
+  if (!resend) {
+    console.log(`[mail] Resend Disabled. Order email for ${to}`)
     return
   }
 
-  const from = process.env.EMAIL_FROM || process.env.SMTP_USER
-  if (!from) {
-    console.error('[mail] EMAIL_FROM env var is missing')
-    return
-  }
+  const from = process.env.EMAIL_FROM || 'onboarding@resend.dev'
 
-  const text = `${intro}
-
-Order: ${order._id}
-Placed by: ${order.username}
-Date: ${new Date(order.createdAt).toLocaleString()}
-
-Items:
-${formatItems(order.items)}
-
-Total: ₹${order.totalAmount}
-`
   const html = `<div>
   <p>${intro}</p>
   <p><b>Order:</b> ${order._id}</p>
@@ -87,22 +71,21 @@ Total: ₹${order.totalAmount}
   <p style="font-weight:700">Total: ₹${order.totalAmount}</p>
 </div>`
 
-  const msg = {
-    to,
-    from,
-    subject,
-    text,
-    html,
-  }
-
   try {
-    await mailer.send(msg)
-    console.log(`[mail] Sent Order email to ${to}`)
-  } catch (error) {
-    console.error('[mail] SendGrid Order Error:', error)
-    if (error.response) {
-      console.error(error.response.body)
+    const { data, error } = await resend.emails.send({
+      from,
+      to,
+      subject,
+      html
+    })
+
+    if (error) {
+      console.error('[mail] Resend Order Error:', error)
+      return
     }
+    console.log(`[mail] Sent Order email to ${to} (ID: ${data.id})`)
+  } catch (err) {
+    console.error('[mail] Resend Exception:', err)
   }
 }
 
