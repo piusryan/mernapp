@@ -31,6 +31,68 @@ app.get('/site-assets/pk1.jpeg', (req, res) => {
   res.sendFile(getAssetPath('pk1.jpeg'))
 });
 
+const { OAuth2Client } = require('google-auth-library');
+
+app.post('/api/auth/google', async (req, res) => {
+  const { token } = req.body;
+  if (!token) return res.status(400).json({ error: 'Missing token' });
+
+  try {
+    const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+    const ticket = await client.verifyIdToken({
+      idToken: token,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+    const payload = ticket.getPayload();
+    const { sub: googleId, email, name } = payload;
+
+    let user = await User.findOne({ $or: [{ googleId }, { email }] });
+
+    if (!user) {
+      // Create new user
+      // Generate a username from email if not present
+      let username = name || email.split('@')[0];
+      // Ensure username uniqueness
+      let existingUser = await User.findOne({ username });
+      let counter = 1;
+      while (existingUser) {
+        username = `${name || email.split('@')[0]}${counter}`;
+        existingUser = await User.findOne({ username });
+        counter++;
+      }
+
+      user = new User({
+        username,
+        email,
+        googleId,
+        emailVerified: true, // Google verified it
+        role: 'customer'
+      });
+      await user.save();
+    } else {
+      // Link Google ID if existing user logged in via email
+      if (!user.googleId) {
+        user.googleId = googleId;
+        if (!user.emailVerified) user.emailVerified = true;
+        await user.save();
+      }
+    }
+
+    const jwtToken = jwt.sign({ id: user._id, role: user.role }, JWT_SECRET, { expiresIn: '1d' });
+    res.json({
+      message: 'Google login successful',
+      token: jwtToken,
+      username: user.username,
+      role: user.role,
+      email: user.email
+    });
+
+  } catch (err) {
+    console.error('Google Auth Error:', err);
+    res.status(401).json({ error: 'Invalid Google token' });
+  }
+});
+
 const MONGO_URI = process.env.MONGO_URI;
 if (!MONGO_URI) {
   console.error('MONGO_URI environment variable is not set');
@@ -47,7 +109,6 @@ const userSchema = new mongoose.Schema(
   {
     username: { type: String, required: true, unique: true, trim: true },
     email: { type: String, unique: true, sparse: true },
-    googleId: { type: String, unique: true, sparse: true },
     role: { type: String, enum: ['admin', 'customer'], default: 'customer' },
     emailVerified: { type: Boolean, default: false },
     passwordHash: { type: String },
