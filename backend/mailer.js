@@ -98,12 +98,20 @@ Total: ₹${order.totalAmount}
     return
   }
   try {
+    if (transport === 'sendgrid') {
+      await sgMail.send({ to, from, subject, text, html })
+      console.log(`[mail] Sent ${isUpdate?'status update':'confirmation'} to ${to} for order ${order._id} via SendGrid`)
+      return
+    }
+
     await transport.sendMail({ from, to, subject, text, html })
     console.log(`[mail] Sent ${isUpdate?'status update':'confirmation'} to ${to} for order ${order._id}`)
   } catch (e) {
     console.error('[mail] Failed to send order email', e && e.message ? e.message : e)
+    if (e.response && e.response.body) console.error(JSON.stringify(e.response.body))
     throw e
   }
 }
 
+module.exports.sendOrderEmail = sendOrderEmail
 module.exports.sendOrderEmail = sendOrderEmail
