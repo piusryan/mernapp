@@ -1,6 +1,7 @@
 import React from 'react';
 import './App.css';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 import Navbar from './components/Navbar';
 import Login from './components/Login';
 import Items from './components/Items';
@@ -110,6 +111,7 @@ function App() {
   }, [token])
   return (
     <BrowserRouter>
+      <SpeedInsights />
       <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
