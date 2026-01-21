@@ -2,9 +2,9 @@ const nodemailer = require('nodemailer')
 
 function buildTransport() {
   const host = process.env.SMTP_HOST
-  const port = Number(process.env.SMTP_PORT || (host ? 587 : 0))
-  const secure = String(process.env.SMTP_SECURE || '').toLowerCase() === 'true'
-  const user = process.env.SMTP_USER || 'yoy181099@gmail.com'
+  const port = Number(process.env.SMTP_PORT || 587)
+  const secure = String(process.env.SMTP_SECURE || 'false').toLowerCase() === 'true'
+  const user = process.env.SMTP_USER
   const pass = process.env.SMTP_PASS
 
   if (process.env.SMTP_DISABLE === '1') {
@@ -12,14 +12,16 @@ function buildTransport() {
   }
 
   if (host) {
+    console.log(`[mail] Transport Config: ${host}:${port} (secure:${secure}) User:${user ? 'Set' : 'Missing'}`)
     return nodemailer.createTransport({
       host,
-      port: port || 587,
+      port,
       secure,
       auth: user && pass ? { user, pass } : undefined,
     })
   }
 
+  console.log('[mail] Using default Gmail service fallback')
   return nodemailer.createTransport({
     service: 'gmail',
     auth: user && pass ? { user, pass } : undefined,
@@ -28,7 +30,7 @@ function buildTransport() {
 
 async function sendOtpEmail(to, otp) {
   const transport = buildTransport()
-  const from = process.env.SMTP_FROM || process.env.SMTP_USER || 'yoy181099@gmail.com'
+  const from = process.env.SMTP_FROM || process.env.SMTP_USER || 'noreply@example.com'
   const subject = 'Your OTP Code'
   const text = `Your OTP is ${otp}. It expires in 10 minutes.`
   const html = `<p>Your OTP is <b>${otp}</b>.</p><p>It expires in 10 minutes.</p>`
@@ -53,7 +55,7 @@ function formatItems(items) {
   return items.map(i => `• ${i.name} × ${i.quantity} — ₹${i.price * i.quantity}`).join('\n')
 }
 
-async function sendOrderEmail(to, order, mode) {
+async function sendOrderEmail(to, order, mode) {nreplexape
   const transport = buildTransport()
   const from = process.env.SMTP_FROM || process.env.SMTP_USER || 'yoy181099@gmail.com'
   const isUpdate = mode && mode !== 'confirmed'
