@@ -91,12 +91,6 @@ export default function Home() {
               <button className="aj-hero-cta-primary" onClick={() => navigate('/items')}>
                 Start Order
               </button>
-              <button className="aj-hero-cta-ghost" onClick={() => {
-                const el = scroller.current
-                if (el) el.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
-              }}>
-                View Flavours
-              </button>
             </div>
             <div className="aj-hero-ai">
               <div className="aj-hero-ai-label">Smart butcher</div>
