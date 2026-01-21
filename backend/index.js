@@ -8,19 +8,27 @@ const path = require('path');
 const { sendOtpEmail, sendOrderEmail } = require('./mailer');
 
 const app = express();
-const port = 5000;
+const port = process.env.PORT || 5000;
 const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-change-me';
 
 const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN || 'http://localhost:3000';
 app.use(cors({ origin: FRONTEND_ORIGIN, credentials: false }));
 app.use(express.json());
-app.use('/images', express.static(path.join(__dirname, '..', 'imaages')));
-app.use('/offerimages', express.static(path.join(__dirname, '..', 'offerimages')));
+
+// Helper to resolve asset paths (checks current dir first, then parent)
+const getAssetPath = (...segments) => {
+  const localPath = path.join(__dirname, ...segments);
+  if (fs.existsSync(localPath)) return localPath;
+  return path.join(__dirname, '..', ...segments);
+};
+
+app.use('/images', express.static(getAssetPath('imaages')));
+app.use('/offerimages', express.static(getAssetPath('offerimages')));
 app.get('/site-assets/plain.jpg', (req, res) => {
-  res.sendFile(path.join(__dirname, '..', 'plain.jpg'))
+  res.sendFile(getAssetPath('plain.jpg'))
 });
 app.get('/site-assets/pk1.jpeg', (req, res) => {
-  res.sendFile(path.join(__dirname, '..', 'pk1.jpeg'))
+  res.sendFile(getAssetPath('pk1.jpeg'))
 });
 
 const MONGO_URI = process.env.MONGO_URI;
