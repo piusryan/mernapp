@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import '../home.css'
 import { API_BASE } from '../api'
 import { useNavigate } from 'react-router-dom'
+// Cleaned up OAuth imports
 
 export default function Login() {
   const [mode, setMode] = useState('login') // 'login' | 'register'
