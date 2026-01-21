@@ -55,9 +55,9 @@ function formatItems(items) {
   return items.map(i => `• ${i.name} × ${i.quantity} — ₹${i.price * i.quantity}`).join('\n')
 }
 
-async function sendOrderEmail(to, order, mode) {nreplexape
+async function sendOrderEmail(to, order, mode) {
   const transport = buildTransport()
-  const from = process.env.SMTP_FROM || process.env.SMTP_USER || 'yoy181099@gmail.com'
+  const from = process.env.SMTP_FROM || process.env.SMTP_USER || 'noreply@example.com'
   const isUpdate = mode && mode !== 'confirmed'
   const subject = isUpdate ? `Your order ${order._id} is ${mode}` : `Order confirmation ${order._id}`
   const intro = isUpdate ? `Good news! Your order is now ${mode}.` : `Thanks for your purchase! We've received your order.`
@@ -98,4 +98,3 @@ Total: ₹${order.totalAmount}
 }
 
 module.exports.sendOrderEmail = sendOrderEmail
-
