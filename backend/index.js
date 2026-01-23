@@ -430,6 +430,27 @@ app.post('/api/cart/remove', authMiddleware, async (req, res) => {
   }
 });
 
+app.post('/api/create-payment-intent', authMiddleware, async (req, res) => {
+  try {
+    const stripeKey = process.env.STRIPE_SECRET_KEY;
+    if (!stripeKey) return res.status(500).json({ error: 'Stripe key missing' });
+    const stripe = Stripe(stripeKey);
+    const cart = await Cart.findOne({ userId: req.userId });
+    if (!cart || cart.items.length === 0) return res.status(400).json({ error: 'Cart is empty' });
+    const totalAmount = cart.items.reduce((sum, i) => sum + i.price * i.quantity, 0);
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: Math.round(totalAmount * 100),
+      currency: 'inr',
+      automatic_payment_methods: { enabled: true },
+      metadata: { userId: String(req.userId) }
+    });
+    res.json({ clientSecret: paymentIntent.client_secret });
+  } catch (e) {
+    console.error('Stripe Intent Error:', e);
+    res.status(500).json({ error: 'Failed to create payment intent' });
+  }
+});
+
 app.post('/api/cart/checkout', authMiddleware, async (req, res) => {
   try {
     const cart = await Cart.findOne({ userId: req.userId });
