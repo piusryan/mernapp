@@ -6,6 +6,7 @@ const jwt = require('jsonwebtoken');
 const fs = require('fs');
 const path = require('path');
 const { sendOtpEmail, sendOrderEmail } = require('./mailer');
+const Stripe = require('stripe');
 
 const app = express();
 const port = process.env.PORT || 5000;

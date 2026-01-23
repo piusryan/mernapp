@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import '../home.css'
 import { API_BASE } from '../api'
 
@@ -10,8 +10,18 @@ export default function Cart() {
   const [latest, setLatest] = useState(null)
   const [notifyEnabled, setNotifyEnabled] = useState(false)
   const navigate = useNavigate()
+  const location = useLocation()
 
   const token = localStorage.getItem('token')
+
+  useEffect(() => {
+    if (location.state && location.state.bill) {
+      setBill(location.state.bill)
+      setCart({ items: [] }) // Ensure cart is cleared in UI
+      // Clear state so refresh doesn't re-trigger (optional)
+      window.history.replaceState({}, document.title)
+    }
+  }, [location])
 
   useEffect(() => {
     if (!token) return navigate('/login')
@@ -117,11 +127,10 @@ export default function Cart() {
               ))}
             </ul>
             <div style={{ marginTop: 8, fontWeight: 600 }}>Total: ₹{total}</div>
-            <button className="aj-cta" style={{ marginTop: 12 }} onClick={checkout} disabled={cart.items.length === 0}>
-              Generate Bill
-            </button>
             <div style={{ marginTop: 12 }}>
-              <button className="btn-modern" style={{ background:'#0a7' }} onClick={enableNotify}>Confirm</button>
+              <button className="btn-modern" style={{ background:'#0a7' }} onClick={() => navigate('/payment')} disabled={cart.items.length === 0}>
+                Confirm & Pay
+              </button>
             </div>
           </div>
           <div>
