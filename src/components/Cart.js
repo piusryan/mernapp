@@ -72,6 +72,7 @@ export default function Cart() {
       setError(e.message)
     }
   }
+  // eslint-disable-next-line no-unused-vars
   async function enableNotify() {
     if (!('Notification' in window)) return alert('Notifications not supported in this browser')
     const perm = await Notification.requestPermission()
