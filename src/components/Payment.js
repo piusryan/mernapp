@@ -89,8 +89,8 @@ export default function Payment() {
         }
       })
       .catch((err) => {
-        console.error(err);
-        alert("Failed to initialize payment");
+        console.error("Payment init error:", err);
+        alert(`Failed to initialize payment: ${err.message}. Checking API: ${API_BASE}`);
         navigate('/cart');
       });
   }, [navigate]);
