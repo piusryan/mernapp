@@ -58,20 +58,8 @@ export default function Cart() {
 
   const total = cart.items.reduce((sum, i) => sum + i.price * i.quantity, 0)
 
-  async function checkout() {
-    try {
-      const res = await fetch(`${API_BASE}/api/cart/checkout`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-      })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Checkout failed')
-      setBill(data)
-      setCart({ items: [] })
-    } catch (e) {
-      setError(e.message)
-    }
-  }
+  // checkout function removed in favor of Stripe payment flow
+
   // eslint-disable-next-line no-unused-vars
   async function enableNotify() {
     if (!('Notification' in window)) return alert('Notifications not supported in this browser')
