@@ -93,71 +93,130 @@ export default function Cart() {
   return (
     <div className="container aj-hero-container">
       <div className="aj-items-shell">
-        <div className="aj-items-header-row">
+        <div className="aj-hero-bg-orb aj-hero-orb-1" />
+        <div className="aj-hero-bg-orb aj-hero-orb-2" />
+        
+        <div className="aj-items-header-row" style={{ position: 'relative', zIndex: 2 }}>
           <div>
-            <div className="aj-items-title">Cart</div>
+            <div className="aj-items-title">Your Cart</div>
             <div className="aj-items-sub">
               Review your cuts and generate a bill when you are ready.
             </div>
           </div>
         </div>
-        {error && <p style={{ color: 'red' }}>{error}</p>}
-        {(cart.items || []).length === 0 && <p style={{ marginTop: 8 }}>Your cart is empty</p>}
 
-        <div className="two-col">
-          <div>
-            <h3>Items</h3>
-            <ul>
-              {(cart.items || []).map((i) => (
-                <li key={String(i.itemId)}>
-                  {i.name} × {i.quantity}
-                  <span className="price">₹{i.price * i.quantity}</span>
-                  <button className="btn-modern" style={{ marginLeft: 8 }} onClick={() => removeItem(i.itemId)}>
-                    Remove
-                  </button>
-                </li>
-              ))}
-            </ul>
-            <div style={{ marginTop: 8, fontWeight: 600 }}>Total: ₹{total}</div>
-            <div style={{ marginTop: 12 }}>
-              <button className="btn-modern" style={{ background:'#0a7' }} onClick={() => navigate('/payment')} disabled={(cart.items || []).length === 0}>
-                Confirm & Pay
-              </button>
-            </div>
+        {error && <p style={{ color: '#ff3d7f', position: 'relative', zIndex: 2 }}>{error}</p>}
+        {(cart.items || []).length === 0 && !bill && (
+          <div style={{ padding: '40px', textAlign: 'center', color: '#666', position: 'relative', zIndex: 2 }}>
+            <h3>Your cart is empty</h3>
+            <button className="aj-cta" style={{ marginTop: 20 }} onClick={() => navigate('/items')}>Start Ordering</button>
           </div>
-          <div>
-            {bill && (
-              <div className="card">
-                <div className="content">
-                  <h3>Bill</h3>
-                  <div>Order ID: {bill.orderId}</div>
-                  <div>Ordered by: {bill.username}</div>
-                  <div>Date: {new Date(bill.createdAt).toLocaleString()}</div>
-                  <ul>
+        )}
+
+        {((cart.items && cart.items.length > 0) || bill || latest) && (
+          <div className="aj-cart-layout" style={{ position: 'relative', zIndex: 2 }}>
+            
+            {/* Left Column: Items */}
+            <div>
+              {cart.items && cart.items.length > 0 && (
+                <div style={{ marginBottom: 24 }}>
+                  {cart.items.map((i) => (
+                    <div key={String(i.itemId)} className="aj-cart-item-row">
+                      <div className="aj-cart-item-info">
+                        <div style={{ width: 48, height: 48, borderRadius: 12, background: '#eee', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24 }}>
+                          🍖
+                        </div>
+                        <div>
+                          <div className="aj-cart-item-name">{i.name}</div>
+                          <div style={{ fontSize: '0.85rem', color: '#666' }}>Quantity: {i.quantity}</div>
+                        </div>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                        <div className="aj-cart-item-price">₹{i.price * i.quantity}</div>
+                        <button className="aj-remove-btn" onClick={() => removeItem(i.itemId)} title="Remove">
+                          ✕
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {bill && (
+                <div className="aj-receipt-wrapper">
+                  <div style={{ textAlign: 'center', marginBottom: 16, borderBottom: '1px dashed #ccc', paddingBottom: 16 }}>
+                    <h3 style={{ margin: 0, textTransform: 'uppercase', letterSpacing: 2 }}>Receipt</h3>
+                    <div style={{ fontSize: 12, color: '#666', marginTop: 4 }}>Order #{bill.orderId.slice(-6).toUpperCase()}</div>
+                    <div style={{ fontSize: 12, color: '#666' }}>{new Date(bill.createdAt).toLocaleString()}</div>
+                  </div>
+                  <ul style={{ listStyle: 'none', padding: 0 }}>
                     {bill.items.map((i, idx) => (
-                      <li key={idx}>
-                        {i.name} × {i.quantity}
-                        <span className="price">₹{i.price * i.quantity}</span>
+                      <li key={idx} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, fontSize: 14 }}>
+                        <span>{i.name} <span style={{ color: '#999' }}>x{i.quantity}</span></span>
+                        <span>₹{i.price * i.quantity}</span>
                       </li>
                     ))}
                   </ul>
-                  <div style={{ fontWeight: 700 }}>Total: ₹{bill.totalAmount}</div>
-                  <p style={{ marginTop: 6, color:'#0a7' }}>A confirmation email has been sent.</p>
+                  <div style={{ borderTop: '1px dashed #ccc', marginTop: 16, paddingTop: 12, display: 'flex', justifyContent: 'space-between', fontWeight: 700 }}>
+                    <span>TOTAL PAID</span>
+                    <span>₹{bill.totalAmount}</span>
+                  </div>
+                  <div style={{ textAlign: 'center', marginTop: 20, fontSize: 12, color: '#888' }}>
+                    Thank you for shopping with AJ Meat Store!
+                  </div>
                 </div>
-              </div>
-            )}
-            {latest && (
-              <div className="card" style={{ marginTop: 12 }}>
-                <div className="content">
-                  <h3>Latest Order Status</h3>
-                  <div>Order ID: {latest._id}</div>
-                  <div>Status: <span className="status-badge">{latest.status}</span></div>
-                  <div>Date: {new Date(latest.createdAt).toLocaleString()}</div>
+              )}
+            </div>
+
+            {/* Right Column: Summary */}
+            <div>
+              {!bill && cart.items && cart.items.length > 0 && (
+                <div className="aj-summary-card">
+                  <div className="aj-summary-title">Order Summary</div>
+                  <div className="aj-summary-row">
+                    <span>Subtotal</span>
+                    <span>₹{total}</span>
+                  </div>
+                  <div className="aj-summary-row">
+                    <span>Taxes & Fees</span>
+                    <span>₹0</span>
+                  </div>
+                  <div className="aj-summary-row">
+                    <span>Delivery</span>
+                    <span style={{ color: '#0a7' }}>Free</span>
+                  </div>
+                  <div className="aj-summary-total">
+                    <span>Total</span>
+                    <span>₹{total}</span>
+                  </div>
+                  <button 
+                    className="aj-checkout-btn" 
+                    onClick={() => navigate('/payment')}
+                    disabled={cart.items.length === 0}
+                  >
+                    Checkout Now
+                  </button>
                 </div>
-              </div>
-            )}
+              )}
+
+              {latest && (
+                <div className="aj-summary-card" style={{ marginTop: 20, animationDelay: '-2s' }}>
+                  <div className="aj-summary-title" style={{ fontSize: '1.1rem' }}>Latest Order</div>
+                  <div style={{ fontSize: '0.9rem', marginBottom: 8 }}>
+                    <strong>ID:</strong> {latest._id.slice(-8)}...
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span>Status:</span>
+                    <span className="status-badge" style={{ background: latest.status === 'delivered' ? '#d4edda' : '#fff3cd', color: latest.status === 'delivered' ? '#155724' : '#856404' }}>
+                      {latest.status}
+                    </span>
+                  </div>
+                </div>
+              )}
+            </div>
+
           </div>
-        </div>
+        )}
       </div>
     </div>
   )

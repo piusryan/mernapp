@@ -548,6 +548,165 @@ li { margin-bottom: 12px; font-size: 1.1rem; }
 }
 
 .aj-hero-orb-1 { background: radial-gradient(circle, #ff3d7f, #ff9a3d); top: -60px; left: -40px; }
+.aj-hero-orb-2 { background: radial-gradient(circle, #41beff, #7f3dff); bottom: -60px; right: -40px; animation-delay: -9s; }
+
+/* Cart Page Styles */
+.aj-cart-layout {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 24px;
+  margin-top: 20px;
+}
+
+@media (max-width: 768px) {
+  .aj-cart-layout { grid-template-columns: 1fr; }
+}
+
+.aj-cart-item-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(255,255,255,0.6);
+  backdrop-filter: blur(8px);
+  padding: 16px;
+  border-radius: 16px;
+  margin-bottom: 12px;
+  border: 1px solid rgba(255,255,255,0.4);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.aj-cart-item-row:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+  background: rgba(255,255,255,0.8);
+}
+
+.aj-cart-item-info { display: flex; align-items: center; gap: 12px; }
+.aj-cart-item-name { font-weight: 600; color: #24121f; font-size: 1.05rem; }
+.aj-cart-item-price { font-weight: 700; color: #ff3d7f; }
+
+.aj-summary-card {
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 24px;
+  padding: 24px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+  position: sticky;
+  top: 90px;
+  animation: float-panel 6s ease-in-out infinite;
+}
+
+@keyframes float-panel {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+.aj-summary-title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin-bottom: 16px;
+  background: linear-gradient(135deg, #24121f, #ff3d7f);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.aj-summary-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  font-size: 0.95rem;
+  color: #4a4a4a;
+}
+
+.aj-summary-total {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 2px dashed rgba(0,0,0,0.1);
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #24121f;
+}
+
+.aj-checkout-btn {
+  width: 100%;
+  margin-top: 24px;
+  padding: 14px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #ff3d7f, #ff9a3d);
+  color: white;
+  font-weight: 700;
+  font-size: 1.1rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 10px 20px rgba(255, 61, 127, 0.3);
+}
+
+.aj-checkout-btn:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 15px 30px rgba(255, 61, 127, 0.4);
+}
+
+.aj-checkout-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.aj-receipt-wrapper {
+  background: #fff;
+  padding: 20px;
+  border-radius: 2px;
+  position: relative;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+  margin-top: 20px;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+.aj-receipt-wrapper::before {
+  content: '';
+  position: absolute;
+  top: -5px;
+  left: 0;
+  width: 100%;
+  height: 10px;
+  background: radial-gradient(circle, transparent, transparent 50%, #fff 50%, #fff);
+  background-size: 10px 10px;
+  transform: rotate(180deg);
+}
+.aj-receipt-wrapper::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 0;
+  width: 100%;
+  height: 10px;
+  background: radial-gradient(circle, transparent, transparent 50%, #fff 50%, #fff);
+  background-size: 10px 10px;
+}
+
+.aj-remove-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #fff;
+  border: 1px solid #eee;
+  color: #ff3d7f;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.aj-remove-btn:hover {
+  background: #ff3d7f;
+  color: #fff;
+}
+
 .aj-hero-orb-2 { background: radial-gradient(circle, #3dd9ff, #7f3dff); bottom: -80px; right: -40px; animation-delay: -4s; }
 .aj-hero-orb-3 { background: radial-gradient(circle, #ffe66d, #ff3d7f); top: 40%; left: 45%; width: 220px; height: 220px; animation-delay: -8s; }
 
