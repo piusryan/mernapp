@@ -102,13 +102,13 @@ export default function Cart() {
           </div>
         </div>
         {error && <p style={{ color: 'red' }}>{error}</p>}
-        {cart.items.length === 0 && <p style={{ marginTop: 8 }}>Your cart is empty</p>}
+        {(cart.items || []).length === 0 && <p style={{ marginTop: 8 }}>Your cart is empty</p>}
 
         <div className="two-col">
           <div>
             <h3>Items</h3>
             <ul>
-              {cart.items.map((i) => (
+              {(cart.items || []).map((i) => (
                 <li key={String(i.itemId)}>
                   {i.name} × {i.quantity}
                   <span className="price">₹{i.price * i.quantity}</span>
@@ -120,7 +120,7 @@ export default function Cart() {
             </ul>
             <div style={{ marginTop: 8, fontWeight: 600 }}>Total: ₹{total}</div>
             <div style={{ marginTop: 12 }}>
-              <button className="btn-modern" style={{ background:'#0a7' }} onClick={() => navigate('/payment')} disabled={cart.items.length === 0}>
+              <button className="btn-modern" style={{ background:'#0a7' }} onClick={() => navigate('/payment')} disabled={(cart.items || []).length === 0}>
                 Confirm & Pay
               </button>
             </div>
