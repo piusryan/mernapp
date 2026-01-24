@@ -28,9 +28,12 @@ export default function Cart() {
     fetch(`${API_BASE}/api/cart`, {
       headers: { Authorization: `Bearer ${token}` },
     })
-      .then((r) => r.json())
+      .then((r) => {
+        if (!r.ok) throw new Error('Failed to load cart')
+        return r.json()
+      })
       .then(setCart)
-      .catch(() => setError('Failed to load cart'))
+      .catch((err) => setError(err.message))
   }, [token, navigate])
 
   useEffect(() => {
@@ -56,7 +59,7 @@ export default function Cart() {
     return () => { if (timer) clearInterval(timer) }
   }, [token, notifyEnabled, latest])
 
-  const total = cart.items.reduce((sum, i) => sum + i.price * i.quantity, 0)
+  const total = (cart.items || []).reduce((sum, i) => sum + i.price * i.quantity, 0)
 
   // checkout function removed in favor of Stripe payment flow
 
