@@ -42,6 +42,14 @@ app.get('/site-assets/pk1.jpeg', (req, res) => {
   res.sendFile(getAssetPath('pk1.jpeg'))
 });
 
+app.get('/debug-config', (req, res) => {
+  res.json({
+    email_from: process.env.EMAIL_FROM,
+    resend_key_exists: !!process.env.RESEND_API_KEY,
+    resend_key_prefix: process.env.RESEND_API_KEY ? process.env.RESEND_API_KEY.substring(0, 5) : 'NONE'
+  });
+});
+
 const MONGO_URI = process.env.MONGO_URI;
 if (!MONGO_URI) {
   console.error('MONGO_URI environment variable is not set');
