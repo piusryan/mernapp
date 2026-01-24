@@ -29,6 +29,7 @@ async function sendOtpEmail(to, otp) {
       from,
       to,
       subject: `AJ Meats Login Verification Code: ${otp}`,
+      text: `Your AJ Meats Login Code is: ${otp}\n\nThis code expires in 10 minutes.\n\nIf you did not request this, please ignore this message.`,
       html: `
         <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
           <h2>AJ Meats Login Verification</h2>
@@ -85,12 +86,15 @@ async function sendOrderEmail(to, order, mode) {
   <p style="font-weight:700">Total: ₹${order.totalAmount}</p>
 </div>`
 
+  const text = `${intro}\n\nOrder: ${order._id}\nPlaced by: ${order.username}\nDate: ${new Date(order.createdAt).toLocaleString()}\n\nItems:\n${formatItems(order.items)}\n\nTotal: ₹${order.totalAmount}`
+
   try {
     const { data, error } = await resend.emails.send({
       from,
       to,
       subject,
-      html
+      html,
+      text
     })
 
     if (error) {
