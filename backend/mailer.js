@@ -28,8 +28,22 @@ async function sendOtpEmail(to, otp) {
     const { data, error } = await resend.emails.send({
       from,
       to,
-      subject: 'Your OTP Code',
-      html: `<p>Your OTP is <b>${otp}</b>.</p><p>It expires in 10 minutes.</p>`
+      subject: `AJ Meats Login Verification Code: ${otp}`,
+      html: `
+        <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2>AJ Meats Login Verification</h2>
+          <p>Hello,</p>
+          <p>You requested a secure login code for your AJ Meats account.</p>
+          <p style="font-size: 24px; font-weight: bold; color: #d32f2f; letter-spacing: 2px;">${otp}</p>
+          <p>This code will expire in 10 minutes. If you did not request this, please ignore this email.</p>
+          <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
+          <p style="font-size: 12px; color: #666;">
+            AJ Meats & Processed Foods<br>
+            Quality Fresh Meat Delivered<br>
+            <a href="https://ajmeats.dpdns.org" style="color: #666;">ajmeats.dpdns.org</a>
+          </p>
+        </div>
+      `
     })
 
     if (error) {
