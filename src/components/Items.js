@@ -189,39 +189,44 @@ export default function Items() {
 
   return (
     <div className="container">
-      <h2>Items {query ? `(search: ${query})` : ''}</h2>
-      <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
-        <button className="btn-modern" onClick={() => setView('all')} disabled={view==='all'}>All</button>
-        <button className="btn-modern" onClick={() => setView('raw')} disabled={view==='raw'}>Raw Meat</button>
-        <button className="btn-modern" onClick={() => setView('processed')} disabled={view==='processed'}>Processed Meat</button>
-      </div>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      
-      <div style={{ display: 'flex', gap: 16, marginBottom: 16, flexWrap: 'wrap', alignItems: 'center', background: '#fff', padding: 12, borderRadius: 8, boxShadow: '0 2px 5px rgba(0,0,0,0.05)' }}>
-          <div style={{ display: 'flex', alignItems: 'center' }}>
-             <label style={{ marginRight: 8, fontWeight: 600, fontSize: '0.9rem' }}>Sort By:</label>
+      <div className="items-header-modern">
+        <h2 className="items-title-modern">Items {query ? `(search: ${query})` : ''}</h2>
+        
+        <div className="category-tabs">
+          <button className={`category-tab ${view === 'all' ? 'active' : ''}`} onClick={() => setView('all')}>All</button>
+          <button className={`category-tab ${view === 'raw' ? 'active' : ''}`} onClick={() => setView('raw')}>Raw Meat</button>
+          <button className={`category-tab ${view === 'processed' ? 'active' : ''}`} onClick={() => setView('processed')}>Processed Meat</button>
+        </div>
+
+        {error && <p style={{ color: 'red' }}>{error}</p>}
+
+        <div className="filter-bar-modern">
+          <div className="filter-group">
+             <label className="filter-label">Sort By</label>
              <select 
+               className="modern-select"
                value={sortOption} 
                onChange={e => setSortOption(e.target.value)} 
-               style={{ padding: '6px 10px', borderRadius: 4, border: '1px solid #ddd' }}
              >
-               <option value="default">Default</option>
+               <option value="default">Recommended</option>
                <option value="priceAsc">Price: Low to High</option>
                <option value="priceDesc">Price: High to Low</option>
              </select>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center' }}>
-             <label style={{ marginRight: 8, fontWeight: 600, fontSize: '0.9rem' }}>Max Price: ₹{maxPrice}</label>
+          <div className="filter-group">
+             <label className="filter-label">Max Price</label>
+             <div className="price-badge">₹{maxPrice}</div>
              <input
+               className="modern-range"
                type="range"
                min="0"
                max="5000"
                step="50"
                value={maxPrice}
                onChange={e => setMaxPrice(Number(e.target.value))}
-               style={{ width: 150, cursor: 'pointer' }}
              />
           </div>
+        </div>
       </div>
 
       {view === 'all' ? (
