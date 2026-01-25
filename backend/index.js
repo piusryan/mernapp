@@ -131,6 +131,21 @@ const orderSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+const wishlistSchema = new mongoose.Schema(
+  {
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, unique: true },
+    items: { type: [
+      new mongoose.Schema({
+        itemId: { type: mongoose.Schema.Types.ObjectId, ref: 'Item', required: true },
+        name: { type: String, required: true },
+        price: { type: Number, required: true },
+        imagePath: { type: String }
+      }, { _id: false })
+    ], default: [] }
+  },
+  { timestamps: true }
+);
+
 const couponSchema = new mongoose.Schema(
   {
     code: { type: String, required: true, unique: true, uppercase: true, trim: true },
