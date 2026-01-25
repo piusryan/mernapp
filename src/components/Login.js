@@ -13,6 +13,7 @@ export default function Login() {
   const [error, setError] = useState('')
   const [promos, setPromos] = useState([])
   const [otpSent, setOtpSent] = useState(false)
+  const [showPass, setShowPass] = useState(false)
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -91,7 +92,12 @@ export default function Login() {
             {mode === 'login' ? (
               <>
                 <input className="auth-input" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} />
-                <input className="auth-input" placeholder="Password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+                <div style={{ position: 'relative' }}>
+                  <input className="auth-input" placeholder="Password" type={showPass ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} style={{ paddingRight: 40 }} />
+                  <button type="button" onClick={() => setShowPass(!showPass)} style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.2rem', padding: 4 }}>
+                    {showPass ? '🙈' : '👁️'}
+                  </button>
+                </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                   <input type="checkbox" checked={adminMode} onChange={(e) => setAdminMode(e.target.checked)} />
                   <span>Admin login (AJadmin)</span>
@@ -107,7 +113,12 @@ export default function Login() {
                   <button className="auth-btn" type="button" onClick={requestOtp}>Get OTP</button>
                 </div>
                 <input className="auth-input" placeholder="6-digit OTP" value={otp} onChange={(e) => setOtp(e.target.value)} />
-                <input className="auth-input" placeholder="Password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+                <div style={{ position: 'relative' }}>
+                  <input className="auth-input" placeholder="Password" type={showPass ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} style={{ paddingRight: 40 }} />
+                  <button type="button" onClick={() => setShowPass(!showPass)} style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.2rem', padding: 4 }}>
+                    {showPass ? '🙈' : '👁️'}
+                  </button>
+                </div>
                 <div className="auth-actions">
                   <button className="auth-btn" type="submit">Register</button>
                 </div>
