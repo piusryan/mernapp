@@ -114,17 +114,7 @@ function App() {
   return (
     <BrowserRouter>
       <Navbar />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/items" element={<Items />} />
-        <Route path="/cart" element={<Cart />} />
-        <Route path="/wishlist" element={<Wishlist />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/payment" element={<Payment />} />
-        <Route path="/admin" element={<AdminDashboard />} />
-        <Route path="/track" element={<Track />} />
-      </Routes>
+      <AnimatedRoutes />
       {open && <CookieConsent onClose={()=>setOpen(false)} forceAccept={forceAccept} />}
     </BrowserRouter>
   );

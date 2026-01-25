@@ -1420,3 +1420,47 @@ li { margin-bottom: 12px; font-size: 1.1rem; }
   opacity: 0.3;
 }
 
+
+
+/* Chicken Page Pusher Animation */
+.page-slide-container {
+  animation: pagePush 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  position: relative;
+  min-height: 100vh;
+  background: #fdfdfd;
+  width: 100%;
+  overflow-x: hidden;
+  transform: translateZ(0); /* Hardware acceleration */
+}
+
+@keyframes pagePush {
+  from { transform: translateX(100vw); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+.chicken-pusher {
+  position: fixed;
+  left: -2px; /* Slight overlap to ensure connection */
+  top: 50%;
+  transform: translateY(-50%) scaleX(-1); /* Face the direction of push */
+  font-size: 10rem;
+  z-index: 9999;
+  filter: drop-shadow(4px 4px 8px rgba(0,0,0,0.3));
+  pointer-events: none;
+  animation: chickenWiggle 0.8s ease-in-out;
+}
+
+/* Wiggle effect to make the chicken look like it is exerting effort */
+@keyframes chickenWiggle {
+  0% { transform: translateY(-50%) scaleX(-1) rotate(0deg); }
+  25% { transform: translateY(-50%) scaleX(-1) rotate(-10deg); }
+  50% { transform: translateY(-50%) scaleX(-1) rotate(5deg); }
+  75% { transform: translateY(-50%) scaleX(-1) rotate(-5deg); }
+  100% { transform: translateY(-50%) scaleX(-1) rotate(0deg); }
+}
+
+/* Ensure body does not scroll horizontally during transition */
+body {
+  overflow-x: hidden;
+}
+
