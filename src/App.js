@@ -2,16 +2,8 @@ import React from 'react';
 import './App.css';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
-import Login from './components/Login';
-import Items from './components/Items';
-import Cart from './components/Cart';
-import Payment from './components/Payment';
-import Home from './components/Home';
-import AdminDashboard from './components/AdminDashboard';
-import Track from './components/Track';
+import AnimatedRoutes from './components/AnimatedRoutes';
 import CookieConsent from './components/CookieConsent';
-import Wishlist from './components/Wishlist';
-import Profile from './components/Profile';
 
 function App() {
   const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
