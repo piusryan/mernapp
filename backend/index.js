@@ -148,6 +148,7 @@ const couponSchema = new mongoose.Schema(
 const User = mongoose.model('User', userSchema);
 const Item = mongoose.model('Item', itemSchema);
 const Cart = mongoose.model('Cart', cartSchema);
+const Wishlist = mongoose.model('Wishlist', wishlistSchema);
 const Order = mongoose.model('Order', orderSchema);
 const Coupon = mongoose.model('Coupon', couponSchema);
 const reviewSchema = new mongoose.Schema(
@@ -371,6 +372,7 @@ app.get('/api/auth/me', authMiddleware, async (req, res) => {
       id: user._id,
       username: user.username,
       role: user.role,
+      email: user.email,
       cookiesAccepted: Boolean(user.cookiesAccepted),
       landmark: user.landmark || '',
       location: user.location || null
@@ -379,6 +381,33 @@ app.get('/api/auth/me', authMiddleware, async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch user' });
   }
 });
+
+app.put('/api/user/profile', authMiddleware, async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const user = await User.findById(req.userId);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    if (email) {
+      const existing = await User.findOne({ email });
+      if (existing && String(existing._id) !== String(user._id)) {
+        return res.status(409).json({ error: 'Email already in use' });
+      }
+      user.email = email;
+    }
+
+    if (password) {
+      user.passwordHash = await bcrypt.hash(password, 10);
+    }
+
+    await user.save();
+    res.json({ ok: true, user: { id: user._id, username: user.username, email: user.email } });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: 'Failed to update profile' });
+  }
+});
+
 app.get('/api/items', async (req, res) => {
   try {
     const { q, category } = req.query || {}
@@ -439,6 +468,39 @@ app.post('/api/cart/remove', authMiddleware, async (req, res) => {
     res.json(cart);
   } catch (e) {
     res.status(500).json({ error: 'Failed to remove from cart' });
+  }
+});
+
+app.get('/api/wishlist', authMiddleware, async (req, res) => {
+  try {
+    let wishlist = await Wishlist.findOne({ userId: req.userId });
+    if (!wishlist) wishlist = await Wishlist.create({ userId: req.userId, items: [] });
+    res.json(wishlist);
+  } catch (e) {
+    res.status(500).json({ error: 'Failed to fetch wishlist' });
+  }
+});
+
+app.post('/api/wishlist/toggle', authMiddleware, async (req, res) => {
+  try {
+    const { itemId } = req.body;
+    if (!itemId) return res.status(400).json({ error: 'itemId required' });
+    const item = await Item.findById(itemId);
+    if (!item) return res.status(404).json({ error: 'Item not found' });
+
+    let wishlist = await Wishlist.findOne({ userId: req.userId });
+    if (!wishlist) wishlist = await Wishlist.create({ userId: req.userId, items: [] });
+
+    const idx = wishlist.items.findIndex(i => String(i.itemId) === String(itemId));
+    if (idx >= 0) {
+      wishlist.items.splice(idx, 1);
+    } else {
+      wishlist.items.push({ itemId: item._id, name: item.name, price: item.price, imagePath: item.imagePath });
+    }
+    await wishlist.save();
+    res.json(wishlist);
+  } catch (e) {
+    res.status(500).json({ error: 'Failed to update wishlist' });
   }
 });
 
@@ -517,6 +579,15 @@ app.get('/api/orders/latest', authMiddleware, async (req, res) => {
     res.json({ _id, userId, username, items, totalAmount, status, createdAt, updatedAt });
   } catch (e) {
     res.status(500).json({ error: 'Failed to fetch order' });
+  }
+});
+
+app.get('/api/orders', authMiddleware, async (req, res) => {
+  try {
+    const orders = await Order.find({ userId: req.userId }).sort({ createdAt: -1 });
+    res.json(orders);
+  } catch (e) {
+    res.status(500).json({ error: 'Failed to fetch orders' });
   }
 });
 

@@ -13,6 +13,9 @@ export default function Items() {
   const [reviews, setReviews] = useState({})
   const [reviewInputs, setReviewInputs] = useState({})
   const [editing, setEditing] = useState({})
+  const [sortOption, setSortOption] = useState('default')
+  const [maxPrice, setMaxPrice] = useState(5000)
+  const [wishlistIds, setWishlistIds] = useState(new Set())
   const navigate = useNavigate()
   const location = useLocation()
   const params = new URLSearchParams(location.search)
@@ -37,7 +40,57 @@ export default function Items() {
       .then((r) => r.json())
       .then(setItems)
       .catch(() => setError('Failed to load items'))
+    
+    // Fetch Wishlist
+    const token = localStorage.getItem('token')
+    if (token) {
+      fetch(`${API_BASE}/api/wishlist`, { headers: { Authorization: `Bearer ${token}` } })
+        .then(r => r.json())
+        .then(d => {
+          if (d.items) {
+            setWishlistIds(new Set(d.items.map(i => i.itemId)))
+          }
+        })
+        .catch(() => {})
+    }
   }, [query])
+
+  async function toggleWishlist(itemId) {
+    const token = localStorage.getItem('token')
+    if (!token) return navigate('/login')
+
+    const newSet = new Set(wishlistIds)
+    if (newSet.has(itemId)) {
+      newSet.delete(itemId)
+    } else {
+      newSet.add(itemId)
+    }
+    setWishlistIds(newSet)
+
+    try {
+      await fetch(`${API_BASE}/api/wishlist/toggle`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ itemId })
+      })
+    } catch (e) {
+      console.error(e)
+    }
+  }
+
+  function getVisibleItems(category) {
+    let res = items
+    if (category) res = res.filter(i => i.category === category)
+    
+    // Filter by price
+    res = res.filter(i => (i.price || 0) <= maxPrice)
+
+    // Sort
+    if (sortOption === 'priceAsc') res = [...res].sort((a, b) => (a.price||0) - (b.price||0))
+    if (sortOption === 'priceDesc') res = [...res].sort((a, b) => (b.price||0) - (a.price||0))
+    
+    return res
+  }
 
   async function addToCart(itemId) {
     const token = localStorage.getItem('token')
@@ -143,13 +196,63 @@ export default function Items() {
         <button className="btn-modern" onClick={() => setView('processed')} disabled={view==='processed'}>Processed Meat</button>
       </div>
       {error && <p style={{ color: 'red' }}>{error}</p>}
+      
+      <div style={{ display: 'flex', gap: 16, marginBottom: 16, flexWrap: 'wrap', alignItems: 'center', background: '#fff', padding: 12, borderRadius: 8, boxShadow: '0 2px 5px rgba(0,0,0,0.05)' }}>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+             <label style={{ marginRight: 8, fontWeight: 600, fontSize: '0.9rem' }}>Sort By:</label>
+             <select 
+               value={sortOption} 
+               onChange={e => setSortOption(e.target.value)} 
+               style={{ padding: '6px 10px', borderRadius: 4, border: '1px solid #ddd' }}
+             >
+               <option value="default">Default</option>
+               <option value="priceAsc">Price: Low to High</option>
+               <option value="priceDesc">Price: High to Low</option>
+             </select>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+             <label style={{ marginRight: 8, fontWeight: 600, fontSize: '0.9rem' }}>Max Price: ₹{maxPrice}</label>
+             <input
+               type="range"
+               min="0"
+               max="5000"
+               step="50"
+               value={maxPrice}
+               onChange={e => setMaxPrice(Number(e.target.value))}
+               style={{ width: 150, cursor: 'pointer' }}
+             />
+          </div>
+      </div>
+
       {view === 'all' ? (
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
           <div>
             <h3>Raw Meat</h3>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 12 }}>
-              {items.filter((i) => i.category === 'raw').map((it) => (
-                <div key={it._id} className="item-card" style={{ padding: 12 }}>
+              {getVisibleItems('raw').map((it) => (
+                <div key={it._id} className="item-card" style={{ padding: 12, position: 'relative' }}>
+                  <div 
+                    onClick={() => toggleWishlist(it._id)}
+                    style={{
+                      position: 'absolute',
+                      top: 10,
+                      right: 10,
+                      background: 'rgba(255,255,255,0.8)',
+                      borderRadius: '50%',
+                      width: 30,
+                      height: 30,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      cursor: 'pointer',
+                      zIndex: 10,
+                      fontSize: '1.2rem',
+                      boxShadow: '0 2px 5px rgba(0,0,0,0.1)'
+                    }}
+                    title={wishlistIds.has(it._id) ? "Remove from Wishlist" : "Add to Wishlist"}
+                  >
+                    {wishlistIds.has(it._id) ? '❤️' : '🤍'}
+                  </div>
                   {srcFor(it) ? (
                     <img src={srcFor(it)} alt={it.name} style={{ width: '100%', height: 140, objectFit: 'cover', borderRadius: 6 }} />
                   ) : <div style={{ width:'100%', height:140, background:'#f5f5f5', borderRadius:6 }} />}
@@ -313,7 +416,29 @@ export default function Items() {
             <h3>Processed Meat</h3>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 12 }}>
               {items.filter((i) => i.category === 'processed').map((it) => (
-                <div key={it._id} className="item-card" style={{ padding: 12 }}>
+                <div key={it._id} className="item-card" style={{ padding: 12, position: 'relative' }}>
+                  <div 
+                    onClick={() => toggleWishlist(it._id)}
+                    style={{
+                      position: 'absolute',
+                      top: 10,
+                      right: 10,
+                      background: 'rgba(255,255,255,0.8)',
+                      borderRadius: '50%',
+                      width: 30,
+                      height: 30,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      cursor: 'pointer',
+                      zIndex: 10,
+                      fontSize: '1.2rem',
+                      boxShadow: '0 2px 5px rgba(0,0,0,0.1)'
+                    }}
+                    title={wishlistIds.has(it._id) ? "Remove from Wishlist" : "Add to Wishlist"}
+                  >
+                    {wishlistIds.has(it._id) ? '❤️' : '🤍'}
+                  </div>
                   {srcFor(it) ? (
                     <img src={srcFor(it)} alt={it.name} style={{ width: '100%', height: 140, objectFit: 'cover', borderRadius: 6 }} />
                   ) : <div style={{ width:'100%', height:140, background:'#f5f5f5', borderRadius:6 }} />}
@@ -476,8 +601,30 @@ export default function Items() {
         </div>
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 12 }}>
-          {items.filter((i) => (view === 'raw' ? i.category === 'raw' : i.category === 'processed')).map((it) => (
-            <div key={it._id} className="item-card" style={{ padding: 12 }}>
+          {getVisibleItems(view === 'raw' ? 'raw' : 'processed').map((it) => (
+            <div key={it._id} className="item-card" style={{ padding: 12, position: 'relative' }}>
+                  <div 
+                    onClick={() => toggleWishlist(it._id)}
+                    style={{
+                      position: 'absolute',
+                      top: 10,
+                      right: 10,
+                      background: 'rgba(255,255,255,0.8)',
+                      borderRadius: '50%',
+                      width: 30,
+                      height: 30,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      cursor: 'pointer',
+                      zIndex: 10,
+                      fontSize: '1.2rem',
+                      boxShadow: '0 2px 5px rgba(0,0,0,0.1)'
+                    }}
+                    title={wishlistIds.has(it._id) ? "Remove from Wishlist" : "Add to Wishlist"}
+                  >
+                    {wishlistIds.has(it._id) ? '❤️' : '🤍'}
+                  </div>
               {srcFor(it) ? (
                 <img src={srcFor(it)} alt={it.name} style={{ width: '100%', height: 140, objectFit: 'cover', borderRadius: 6 }} />
               ) : <div style={{ width:'100%', height:140, background:'#f5f5f5', borderRadius:6 }} />}
