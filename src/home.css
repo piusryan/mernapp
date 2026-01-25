@@ -1,9 +1,12 @@
 body {
   font-family: Arial, sans-serif;
-  background-image: url('./plain.jpg');
+  background-color: #121418;
+  background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.8)), url('./plain.jpg');
   background-size: cover;
   background-position: center;
+  background-attachment: fixed;
   padding: 10px;
+  color: #e0e0e0;
 }
 
 .top-nav {
@@ -15,10 +18,10 @@ body {
   display: flex;
   align-items: center;
   backdrop-filter: blur(12px);
-  background: rgba(20, 22, 28, 0.85);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(20, 22, 28, 0.9);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   z-index: 1000;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.6);
 }
 
 .nav-container { display: flex; align-items: center; gap: 16px; width: 100%; padding: 0 16px; }
@@ -69,7 +72,8 @@ li { margin-bottom: 12px; font-size: 1.1rem; }
 }
 
 .hero {
-  background: linear-gradient(135deg, rgba(240,4,80,0.1), rgba(0,123,255,0.1));
+  background: linear-gradient(135deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+  border: 1px solid rgba(255,255,255,0.05);
   border-radius: 12px;
   padding: 16px;
   margin-bottom: 16px;
