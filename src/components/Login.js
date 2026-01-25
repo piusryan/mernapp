@@ -12,6 +12,7 @@ export default function Login() {
   const [adminMode, setAdminMode] = useState(false)
   const [error, setError] = useState('')
   const [promos, setPromos] = useState([])
+  const [otpSent, setOtpSent] = useState(false)
   const navigate = useNavigate()
 
   useEffect(() => {

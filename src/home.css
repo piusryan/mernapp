@@ -626,7 +626,117 @@ li { margin-bottom: 12px; font-size: 1.1rem; }
   padding-top: 16px;
   border-top: 2px dashed rgba(0,0,0,0.1);
   font-size: 1.2rem;
+}
+
+/* OTP Success Modal */
+.otp-success-modal {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 24px;
+  padding: 40px 32px;
+  width: 90%;
+  max-width: 400px;
+  text-align: center;
+  box-shadow: 0 25px 80px rgba(0,0,0,0.35);
+  animation: popIn 0.5s cubic-bezier(0.19, 1, 0.22, 1) forwards;
+  position: relative;
+  border: 1px solid rgba(255,255,255,0.6);
+}
+.otp-success-modal::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 26px;
+  padding: 2px;
+  background: linear-gradient(135deg, #ff3d7f, #3dd9ff);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+.otp-icon-container {
+  width: 88px;
+  height: 88px;
+  background: linear-gradient(135deg, #e0f7fa, #e8f5e9);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 24px;
+  box-shadow: 0 12px 24px rgba(61, 217, 255, 0.15);
+  position: relative;
+}
+.otp-icon-container::before {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 2px dashed rgba(61, 217, 255, 0.3);
+  animation: spinSlow 10s linear infinite;
+}
+
+.otp-icon {
+  font-size: 42px;
+  animation: checkPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s both;
+  display: block;
+}
+
+.otp-title {
+  font-size: 1.75rem;
   font-weight: 800;
+  color: #1a1a1a;
+  margin-bottom: 12px;
+  letter-spacing: -0.5px;
+  background: linear-gradient(135deg, #222, #555);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.otp-msg {
+  color: #666;
+  margin-bottom: 28px;
+  line-height: 1.6;
+  font-size: 1.05rem;
+}
+
+.otp-btn {
+  background: #111;
+  color: #fff;
+  border: none;
+  padding: 14px 32px;
+  border-radius: 14px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  width: 100%;
+}
+.otp-btn:hover {
+  background: #000;
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px rgba(0,0,0,0.25);
+}
+.otp-btn:active {
+  transform: translateY(0);
+}
+
+@keyframes popIn {
+  from { opacity: 0; transform: scale(0.9) translateY(40px); filter: blur(10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); }
+}
+
+@keyframes checkPop {
+  from { transform: scale(0) rotate(-90deg); opacity: 0; }
+  to { transform: scale(1) rotate(0); opacity: 1; }
+}
+
+@keyframes spinSlow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}  font-weight: 800;
   color: #24121f;
 }
 
