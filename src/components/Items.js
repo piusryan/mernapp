@@ -561,7 +561,12 @@ export default function Items() {
                   min={1}
                   value={qty[it._id] ?? 1}
                   onChange={(e) => {
-                    const v = Number(e.target.value)
+                    const val = e.target.value
+                    if (val === '') {
+                      setQty((prev) => ({ ...prev, [it._id]: '' }))
+                      return
+                    }
+                    const v = Number(val)
                     setQty((prev) => ({ ...prev, [it._id]: isNaN(v) ? 1 : Math.max(1, v) }))
                   }}
                   className="aj-qty"
