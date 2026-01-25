@@ -74,89 +74,115 @@ export default function Profile() {
     }
   };
 
-  if (!user) return <div className="container">Loading...</div>;
+  if (!user) return <div className="container" style={{textAlign: 'center', marginTop: '100px'}}>Loading...</div>;
 
   return (
-    <div className="container">
-      <h2>My Profile</h2>
-      <div style={{ display: 'flex', gap: '20px', marginBottom: '20px' }}>
+    <div className="profile-container">
+      <div className="profile-header">
+        <h2 className="profile-title">My Profile</h2>
+        <p className="profile-subtitle">Manage your account and view orders</p>
+      </div>
+      
+      <div className="profile-tabs">
         <button 
-          className={activeTab === 'orders' ? 'auth-tab active' : 'auth-tab'} 
+          className={`profile-tab ${activeTab === 'orders' ? 'active' : ''}`} 
           onClick={() => setActiveTab('orders')}
         >
           My Orders
         </button>
         <button 
-          className={activeTab === 'profile' ? 'auth-tab active' : 'auth-tab'} 
+          className={`profile-tab ${activeTab === 'profile' ? 'active' : ''}`} 
           onClick={() => setActiveTab('profile')}
         >
           Edit Profile
         </button>
       </div>
 
-      {activeTab === 'orders' && (
-        <div className="item-card" style={{ padding: '20px' }}>
-          <h3>Order History</h3>
-          {orders.length === 0 ? (
-            <p>No orders found.</p>
-          ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-              {orders.map(order => (
-                <div key={order._id} style={{ borderBottom: '1px solid #eee', paddingBottom: '10px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold' }}>
-                    <span>{order.trackingNumber || order._id}</span>
-                    <span>₹{order.totalAmount}</span>
+      <div className="profile-content">
+        {activeTab === 'orders' && (
+          <div className="animate-fade-in">
+            {orders.length === 0 ? (
+              <div className="empty-state">
+                <div className="empty-icon">📦</div>
+                <p>No orders found.</p>
+              </div>
+            ) : (
+              <div className="order-list">
+                {orders.map(order => (
+                  <div key={order._id} className="order-card">
+                    <div className="order-header">
+                      <span className="order-id">#{order.trackingNumber || order._id.slice(-8).toUpperCase()}</span>
+                      <span className="order-date">
+                        {new Date(order.createdAt).toLocaleDateString()} • {new Date(order.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                      </span>
+                    </div>
+                    <div className="order-body">
+                      <div className="order-items">
+                        {order.items.map((i, idx) => (
+                          <div key={idx}>
+                            {i.name} <span style={{opacity: 0.6}}>x{i.quantity}</span>
+                          </div>
+                        ))}
+                      </div>
+                      <div style={{textAlign: 'right'}}>
+                         <div className="order-price">₹{order.totalAmount}</div>
+                         <div style={{marginTop: '4px'}}>
+                           <span className={`order-status status-${order.status?.toLowerCase() || 'pending'}`}>
+                             {order.status}
+                           </span>
+                         </div>
+                      </div>
+                    </div>
                   </div>
-                  <div style={{ color: '#666', fontSize: '0.9em' }}>
-                    {new Date(order.createdAt).toLocaleDateString()} at {new Date(order.createdAt).toLocaleTimeString()}
-                  </div>
-                  <div style={{ margin: '5px 0' }}>
-                    <span className="status-badge">{order.status}</span>
-                  </div>
-                  <div style={{ fontSize: '0.9em' }}>
-                    {order.items.map(i => `${i.name} x${i.quantity}`).join(', ')}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
+                ))}
+              </div>
+            )}
+          </div>
+        )}
 
-      {activeTab === 'profile' && (
-        <div className="item-card" style={{ padding: '20px' }}>
-          <h3>Edit Details</h3>
-          {error && <p style={{ color: 'red' }}>{error}</p>}
-          {message && <p style={{ color: 'green' }}>{message}</p>}
-          <form onSubmit={handleUpdateProfile} style={{ display: 'flex', flexDirection: 'column', gap: '10px', maxWidth: '400px' }}>
-            <div>
-              <label style={{ display: 'block', marginBottom: '5px' }}>Username</label>
-              <input type="text" value={user.username} disabled className="search-input" style={{ backgroundColor: '#f0f0f0', width: '100%' }} />
-            </div>
-            <div>
-              <label style={{ display: 'block', marginBottom: '5px' }}>Email</label>
-              <input 
-                type="email" 
-                value={email} 
-                onChange={e => setEmail(e.target.value)} 
-                className="search-input" 
-                style={{ width: '100%' }}
-              />
-            </div>
-            <div>
-              <label style={{ display: 'block', marginBottom: '5px' }}>New Password (leave blank to keep current)</label>
-              <input 
-                type="password" 
-                value={password} 
-                onChange={e => setPassword(e.target.value)} 
-                className="search-input" 
-                style={{ width: '100%' }}
-              />
-            </div>
-            <button type="submit" className="search-btn" style={{ marginTop: '10px' }}>Save Changes</button>
-          </form>
-        </div>
-      )}
+        {activeTab === 'profile' && (
+          <div className="profile-form-container animate-fade-in">
+            {error && <div style={{ color: '#721c24', background: '#f8d7da', padding: '10px', borderRadius: '8px', marginBottom: '16px' }}>{error}</div>}
+            {message && <div style={{ color: '#155724', background: '#d4edda', padding: '10px', borderRadius: '8px', marginBottom: '16px' }}>{message}</div>}
+            
+            <form onSubmit={handleUpdateProfile}>
+              <div className="form-group">
+                <label className="form-label">Username</label>
+                <input 
+                  type="text" 
+                  value={user.username} 
+                  disabled 
+                  className="form-input" 
+                />
+              </div>
+              
+              <div className="form-group">
+                <label className="form-label">Email Address</label>
+                <input 
+                  type="email" 
+                  value={email} 
+                  onChange={e => setEmail(e.target.value)} 
+                  className="form-input" 
+                  placeholder="Enter your email"
+                />
+              </div>
+              
+              <div className="form-group">
+                <label className="form-label">New Password</label>
+                <input 
+                  type="password" 
+                  value={password} 
+                  onChange={e => setPassword(e.target.value)} 
+                  className="form-input" 
+                  placeholder="Leave blank to keep current"
+                />
+              </div>
+              
+              <button type="submit" className="save-btn">Save Changes</button>
+            </form>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

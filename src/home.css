@@ -1199,3 +1199,224 @@ li { margin-bottom: 12px; font-size: 1.1rem; }
   box-shadow: 0 4px 12px rgba(255, 61, 127, 0.25);
 }
 
+
+
+/* Profile Page Improvements */
+.profile-container {
+  max-width: 800px;
+  margin: 100px auto 40px;
+  padding: 0 20px;
+}
+
+.profile-header {
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.profile-title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #24121f, #ff3d7f);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 10px;
+}
+
+.profile-subtitle {
+  color: #666;
+  font-size: 1.1rem;
+}
+
+.profile-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 30px;
+  background: rgba(255,255,255,0.5);
+  padding: 8px;
+  border-radius: 999px;
+  backdrop-filter: blur(10px);
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+  border: 1px solid rgba(0,0,0,0.05);
+}
+
+.profile-tab {
+  padding: 10px 24px;
+  border-radius: 999px;
+  border: none;
+  background: transparent;
+  color: #555;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 1rem;
+}
+
+.profile-tab.active {
+  background: linear-gradient(135deg, #24121f, #ff3d7f);
+  color: #fff;
+  box-shadow: 0 4px 15px rgba(255, 61, 127, 0.3);
+}
+
+.profile-content {
+  background: #fff;
+  border-radius: 24px;
+  padding: 30px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.08);
+  border: 1px solid rgba(0,0,0,0.05);
+  min-height: 400px;
+}
+
+/* Order History Cards */
+.order-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.order-card {
+  border: 1px solid #eee;
+  border-radius: 16px;
+  padding: 20px;
+  transition: all 0.2s ease;
+  background: #fcfcfc;
+}
+
+.order-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+  border-color: rgba(255, 61, 127, 0.2);
+  background: #fff;
+}
+
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px dashed #eee;
+}
+
+.order-id {
+  font-weight: 700;
+  color: #24121f;
+  font-family: monospace;
+  font-size: 1.1rem;
+}
+
+.order-date {
+  font-size: 0.9rem;
+  color: #888;
+}
+
+.order-body {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.order-items {
+  flex: 1;
+  color: #555;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.order-price {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #ff3d7f;
+}
+
+.order-status {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-pending { background: #fff3cd; color: #856404; }
+.status-confirmed { background: #d4edda; color: #155724; }
+.status-shipped { background: #cce5ff; color: #004085; }
+.status-delivered { background: #d1e7dd; color: #0f5132; }
+.status-cancelled { background: #f8d7da; color: #721c24; }
+
+/* Profile Form */
+.profile-form-container {
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #444;
+  font-size: 0.95rem;
+}
+
+.form-input {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+  background: #f9f9f9;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #ff3d7f;
+  background: #fff;
+  box-shadow: 0 0 0 4px rgba(255, 61, 127, 0.1);
+}
+
+.form-input:disabled {
+  background: #eee;
+  color: #888;
+  cursor: not-allowed;
+}
+
+.save-btn {
+  width: 100%;
+  padding: 14px;
+  border-radius: 12px;
+  border: none;
+  background: linear-gradient(135deg, #222, #444);
+  color: #fff;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 10px;
+}
+
+.save-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+  background: linear-gradient(135deg, #000, #222);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px;
+  color: #888;
+}
+
+.empty-icon {
+  font-size: 3rem;
+  margin-bottom: 16px;
+  opacity: 0.3;
+}
+
