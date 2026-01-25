@@ -1461,13 +1461,13 @@ body {
   display: flex;
   gap: 12px;
   margin-bottom: 24px;
-  background: rgba(30, 30, 40, 0.8);
+  background: linear-gradient(135deg, rgba(200, 200, 200, 0.4), rgba(240, 240, 240, 0.2));
   padding: 6px;
   border-radius: 999px;
   display: inline-flex;
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
 }
 
 .category-tab {
@@ -1475,25 +1475,28 @@ body {
   border-radius: 999px;
   border: none;
   background: transparent;
-  color: #aaa;
+  color: #444;
   font-weight: 600;
   font-size: 0.95rem;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.4);
 }
 
 .category-tab:hover {
-  color: #fff;
-  background: rgba(255, 255, 255, 0.05);
+  color: #000;
+  background: rgba(255, 255, 255, 0.3);
+  box-shadow: inset 0 0 10px rgba(255,255,255,0.5);
 }
 
 .category-tab.active {
-  background: linear-gradient(135deg, #ff3d7f, #ff9a3d);
-  color: white;
-  box-shadow: 0 8px 20px rgba(255, 61, 127, 0.3);
+  background: linear-gradient(135deg, #8e9eab, #eef2f3);
+  color: #222;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.8);
   transform: translateY(-1px);
+  border: 1px solid rgba(255,255,255,0.6);
 }
 
 /* Modern Filter Bar */
@@ -1501,12 +1504,12 @@ body {
   display: flex;
   gap: 32px;
   align-items: center;
-  background: rgba(30, 30, 40, 0.8);
+  background: linear-gradient(135deg, rgba(220, 220, 225, 0.6), rgba(240, 240, 245, 0.4));
   backdrop-filter: blur(16px);
   padding: 16px 24px;
   border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
   margin-bottom: 32px;
   flex-wrap: wrap;
 }
@@ -1519,45 +1522,47 @@ body {
 
 .filter-label {
   font-weight: 700;
-  color: #ccc;
+  color: #444;
   font-size: 0.9rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   opacity: 0.9;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.4);
 }
 
 .modern-select {
   padding: 10px 16px;
   border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  background: rgba(0,0,0,0.3);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  background: linear-gradient(to bottom, #f7f7f7, #e0e0e0);
   font-size: 0.95rem;
-  color: #fff;
+  color: #333;
   cursor: pointer;
   outline: none;
   transition: all 0.2s;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05), inset 0 1px 0 rgba(255,255,255,0.8);
 }
 
 .modern-select option {
-  background: #222;
-  color: #fff;
+  background: #f0f0f0;
+  color: #333;
 }
 
 .modern-select:hover, .modern-select:focus {
-  border-color: #ff3d7f;
-  box-shadow: 0 4px 15px rgba(255, 61, 127, 0.2);
+  border-color: #999;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 
 .modern-range {
   -webkit-appearance: none;
   width: 200px;
   height: 6px;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.1);
   border-radius: 10px;
   outline: none;
   opacity: 0.8;
   transition: opacity .2s;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
 }
 
 .modern-range:hover {
