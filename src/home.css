@@ -1121,3 +1121,81 @@ li { margin-bottom: 12px; font-size: 1.1rem; }
   .search-input { min-width: 200px; }
   .slides .slide img { height: 280px; }
 }
+
+
+/* Profile Circle & Classy Nav Enhancements */
+.profile-circle {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #24121f, #ff3d7f);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  text-decoration: none;
+  font-size: 1.2rem;
+  box-shadow: 0 4px 12px rgba(255, 61, 127, 0.25);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border: 2px solid rgba(255,255,255,0.2);
+}
+
+.profile-circle:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(255, 61, 127, 0.4);
+  color: #fff;
+}
+
+.profile-circle.active {
+  box-shadow: 0 0 0 2px #fff, 0 8px 24px rgba(255, 61, 127, 0.5);
+}
+
+/* Polish Search Bar */
+.nav-search {
+  background: rgba(255,255,255,0.5);
+  border-radius: 999px;
+  padding: 4px;
+  border: 1px solid rgba(0,0,0,0.08);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.nav-search:focus-within {
+  border-color: #ff3d7f;
+  box-shadow: 0 4px 12px rgba(255, 61, 127, 0.15);
+  background: #fff;
+}
+
+.search-input {
+  border: none;
+  background: transparent;
+  min-width: 200px;
+  padding: 6px 12px;
+  outline: none;
+  font-size: 0.95rem;
+}
+
+.search-btn {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #222;
+  transition: background 0.2s ease;
+}
+
+.search-btn:hover {
+  background: #ff3d7f;
+}
+
+
+
+/* Override Nav Link Active for Consistency */
+.nav-link.active {
+  background: linear-gradient(135deg, #24121f, #ff3d7f);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(255, 61, 127, 0.25);
+}
+

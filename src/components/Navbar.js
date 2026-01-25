@@ -10,10 +10,12 @@ export default function Navbar() {
   const [adminForm, setAdminForm] = useState({ name: '', description: '', price: '', category: 'raw', imagePath: '', grams: '', pieces: '', serves: '' })
   const token = localStorage.getItem('token')
   let isAdmin = false
+  let username = ''
   if (token) {
     try {
       const payload = JSON.parse(atob(token.split('.')[1]))
       isAdmin = payload && payload.role === 'admin' && payload.username === 'AJadmin'
+      username = payload.username || ''
     } catch {}
   }
   function submitSearch(e) {
@@ -75,21 +77,25 @@ export default function Navbar() {
             <NavLink to="/items" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Items</NavLink>
             <NavLink to="/cart" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Cart</NavLink>
             {token && <NavLink to="/wishlist" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Wishlist</NavLink>}
-            {token && <NavLink to="/profile" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Profile</NavLink>}
             {isAdmin && <NavLink to="/track" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Track</NavLink>}
             {isAdmin && <NavLink to="/admin" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Admin</NavLink>}
           </div>
           <form className="nav-search" onSubmit={submitSearch}>
             <input
               className="search-input"
-              placeholder="Search meat, cut, product"
+              placeholder="Search..."
               value={term}
               onChange={(e) => setTerm(e.target.value)}
             />
-            <button className="search-btn" type="submit">Search</button>
+            <button className="search-btn" type="submit">🔍</button>
           </form>
-          <div className="nav-actions" style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+          <div className="nav-actions" style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
             {!token && <a href="/login" className="nav-link">Login</a>}
+            {token && (
+              <NavLink to="/profile" className="profile-circle" title="Profile">
+                {username ? username.charAt(0).toUpperCase() : 'U'}
+              </NavLink>
+            )}
             {isAdmin && (
               <button className="fab-add" title="Add" onClick={()=>setShowAdmin(true)}>+</button>
             )}
