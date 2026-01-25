@@ -94,7 +94,7 @@ export default function Login() {
                 <input className="auth-input" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} />
                 <div style={{ position: 'relative' }}>
                   <input className="auth-input" placeholder="Password" type={showPass ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} style={{ paddingRight: 40 }} />
-                  <button type="button" onClick={() => setShowPass(!showPass)} style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.2rem', padding: 4 }}>
+                  <button type="button" onClick={() => setShowPass(!showPass)} style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.2rem', padding: 4, zIndex: 10, color: '#333' }}>
                     {showPass ? '🙈' : '👁️'}
                   </button>
                 </div>
@@ -115,7 +115,7 @@ export default function Login() {
                 <input className="auth-input" placeholder="6-digit OTP" value={otp} onChange={(e) => setOtp(e.target.value)} />
                 <div style={{ position: 'relative' }}>
                   <input className="auth-input" placeholder="Password" type={showPass ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} style={{ paddingRight: 40 }} />
-                  <button type="button" onClick={() => setShowPass(!showPass)} style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.2rem', padding: 4 }}>
+                  <button type="button" onClick={() => setShowPass(!showPass)} style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.2rem', padding: 4, zIndex: 10, color: '#333' }}>
                     {showPass ? '🙈' : '👁️'}
                   </button>
                 </div>
