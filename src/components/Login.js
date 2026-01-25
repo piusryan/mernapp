@@ -57,7 +57,7 @@ export default function Login() {
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'OTP request failed')
-      alert('OTP sent to your email')
+      setOtpSent(true)
     } catch (err) {
       setError(err.message)
     }
@@ -65,6 +65,19 @@ export default function Login() {
 
   return (
     <div className="overlay" onClick={() => navigate('/')}>
+      {otpSent ? (
+        <div className="otp-success-modal" onClick={(e) => e.stopPropagation()}>
+          <div className="otp-icon-container">
+            <span className="otp-icon">✓</span>
+          </div>
+          <div className="otp-title">Check Your Email</div>
+          <div className="otp-msg">
+            We've sent a verification code to <strong>{email}</strong>.
+            <br/>Please enter it below to verify.
+          </div>
+          <button className="otp-btn" onClick={() => setOtpSent(false)}>Got it</button>
+        </div>
+      ) : (
       <div className="auth-card" onClick={(e) => e.stopPropagation()}>
         <div>
           <div className="auth-header">
@@ -112,6 +125,7 @@ export default function Login() {
           </div>
         </div>
       </div>
+      )}
     </div>
   )
 }
