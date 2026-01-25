@@ -214,26 +214,26 @@ li { margin-bottom: 12px; font-size: 1.1rem; }
   animation: fadeIn 0.2s ease;
   backdrop-filter: blur(12px);
 }
-.popup { background:#fff; border-radius:12px; padding:16px 20px; box-shadow: 0 14px 30px rgba(0,0,0,0.2); width: 320px; text-align:center; }
-.popup h4 { margin: 0 0 8px 0; }
+.popup { background: linear-gradient(145deg, #1e2025, #14161a); border-radius:12px; padding:16px 20px; box-shadow: 0 14px 30px rgba(0,0,0,0.5); width: 320px; text-align:center; color: #eee; border: 1px solid rgba(255,255,255,0.1); }
+.popup h4 { margin: 0 0 8px 0; color: #fff; }
 .popup .ok { margin-top: 12px; }
 .admin-map { height: 360px; border-radius: 12px; overflow: hidden; }
 .cookie-modal { width: 520px; padding: 24px; position: relative; }
-.cookie-close { position: absolute; right: 10px; top: 10px; width: 28px; height: 28px; border-radius: 50%; border: none; background: #eee; color: #333; font-weight: 700; cursor: pointer; }
-.cookie-close:hover { background: #ddd; }
+.cookie-close { position: absolute; right: 10px; top: 10px; width: 28px; height: 28px; border-radius: 50%; border: none; background: rgba(255,255,255,0.1); color: #fff; font-weight: 700; cursor: pointer; }
+.cookie-close:hover { background: rgba(255,255,255,0.2); }
 .cookie-graphic { position: relative; font-size: 52px; line-height: 1; }
 .cookie-graphic::before { content: ''; position: absolute; width: 84px; height: 84px; border-radius: 50%; background: #3dd9ff; left: -12px; top: -14px; opacity: 0.25; }
 .cookie-cta { background:#3dd9ff; color:#114; border:none; padding:12px 18px; border-radius:12px; cursor:pointer; font-weight:700; }
 .cookie-cta:hover { background:#2cc8f0; }
-.cookie-secondary { background:#eee; color:#333; border:none; padding:12px 18px; border-radius:12px; cursor:pointer; font-weight:600; }
-.cookie-secondary:hover { background:#ddd; }
-.cookie-caption { font-size: 12px; color: #777; margin-top: 6px; }
-.admin-drawer-backdrop { position: fixed; left: 0; right: 0; top: 64px; bottom: 0; background: rgba(0,0,0,0.25); z-index: 1500; }
-.admin-drawer { position: fixed; right: 24px; bottom: 24px; width: 480px; background:#fff; border-radius: 16px; box-shadow: 0 18px 40px rgba(0,0,0,0.25); z-index: 1600; overflow: hidden; }
-.drawer-header { font-weight: 700; padding: 12px 16px; border-bottom: 1px solid #eee; }
+.cookie-secondary { background:rgba(255,255,255,0.1); color:#eee; border:none; padding:12px 18px; border-radius:12px; cursor:pointer; font-weight:600; }
+.cookie-secondary:hover { background:rgba(255,255,255,0.2); }
+.cookie-caption { font-size: 12px; color: #aaa; margin-top: 6px; }
+.admin-drawer-backdrop { position: fixed; left: 0; right: 0; top: 64px; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1500; backdrop-filter: blur(4px); }
+.admin-drawer { position: fixed; right: 24px; bottom: 24px; width: 480px; background: linear-gradient(145deg, #1e2025, #14161a); border-radius: 16px; box-shadow: 0 18px 40px rgba(0,0,0,0.5); z-index: 1600; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); color: #e0e0e0; }
+.drawer-header { font-weight: 700; padding: 12px 16px; border-bottom: 1px solid rgba(255,255,255,0.1); }
 .drawer-body { padding: 12px 16px; display:grid; gap:8px; }
-.drawer-label { font-size: 12px; color:#444; }
-.drawer-actions { padding: 12px 16px; border-top: 1px solid #eee; display:flex; gap:8px; }
+.drawer-label { font-size: 12px; color:#aaa; }
+.drawer-actions { padding: 12px 16px; border-top: 1px solid rgba(255,255,255,0.1); display:flex; gap:8px; }
 
 @keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
 @keyframes pulse { 0% { transform: scale(1) } 50% { transform: scale(1.03) } 100% { transform: scale(1) } }
