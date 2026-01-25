@@ -736,8 +736,6 @@ li { margin-bottom: 12px; font-size: 1.1rem; }
 @keyframes spinSlow {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
-}  font-weight: 800;
-  color: #24121f;
 }
 
 .aj-checkout-btn {
