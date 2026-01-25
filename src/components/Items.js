@@ -140,7 +140,7 @@ export default function Items() {
     if (s === 'available') return '#0a7'
     if (s === 'limited') return '#d9a300'
     if (s === 'outofstock') return '#d33'
-    return '#ccc'
+    return '#555'
   }
 
   async function toggleReviews(item) {
@@ -189,44 +189,39 @@ export default function Items() {
 
   return (
     <div className="container">
-      <div className="items-header-modern">
-        <h2 className="items-title-modern">Items {query ? `(search: ${query})` : ''}</h2>
-        
-        <div className="category-tabs">
-          <button className={`category-tab ${view === 'all' ? 'active' : ''}`} onClick={() => setView('all')}>All</button>
-          <button className={`category-tab ${view === 'raw' ? 'active' : ''}`} onClick={() => setView('raw')}>Raw Meat</button>
-          <button className={`category-tab ${view === 'processed' ? 'active' : ''}`} onClick={() => setView('processed')}>Processed Meat</button>
-        </div>
-
-        {error && <p style={{ color: 'red' }}>{error}</p>}
-
-        <div className="filter-bar-modern">
-          <div className="filter-group">
-             <label className="filter-label">Sort By</label>
+      <h2>Items {query ? `(search: ${query})` : ''}</h2>
+      <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
+        <button className="btn-modern" onClick={() => setView('all')} disabled={view==='all'}>All</button>
+        <button className="btn-modern" onClick={() => setView('raw')} disabled={view==='raw'}>Raw Meat</button>
+        <button className="btn-modern" onClick={() => setView('processed')} disabled={view==='processed'}>Processed Meat</button>
+      </div>
+      {error && <p style={{ color: 'red' }}>{error}</p>}
+      
+      <div style={{ display: 'flex', gap: 16, marginBottom: 16, flexWrap: 'wrap', alignItems: 'center', background: '#fff', padding: 12, borderRadius: 8, boxShadow: '0 2px 5px rgba(0,0,0,0.05)' }}>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+             <label style={{ marginRight: 8, fontWeight: 600, fontSize: '0.9rem' }}>Sort By:</label>
              <select 
-               className="modern-select"
                value={sortOption} 
                onChange={e => setSortOption(e.target.value)} 
+               style={{ padding: '6px 10px', borderRadius: 4, border: '1px solid #ddd' }}
              >
-               <option value="default">Recommended</option>
+               <option value="default">Default</option>
                <option value="priceAsc">Price: Low to High</option>
                <option value="priceDesc">Price: High to Low</option>
              </select>
           </div>
-          <div className="filter-group">
-             <label className="filter-label">Max Price</label>
-             <div className="price-badge">₹{maxPrice}</div>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+             <label style={{ marginRight: 8, fontWeight: 600, fontSize: '0.9rem' }}>Max Price: ₹{maxPrice}</label>
              <input
-               className="modern-range"
                type="range"
                min="0"
                max="5000"
                step="50"
                value={maxPrice}
                onChange={e => setMaxPrice(Number(e.target.value))}
+               style={{ width: 150, cursor: 'pointer' }}
              />
           </div>
-        </div>
       </div>
 
       {view === 'all' ? (
@@ -242,19 +237,17 @@ export default function Items() {
                       position: 'absolute',
                       top: 10,
                       right: 10,
-                      background: 'rgba(255,255,255,0.25)',
-                      backdropFilter: 'blur(4px)',
-                      border: '1px solid rgba(255,255,255,0.4)',
+                      background: 'rgba(255,255,255,0.8)',
                       borderRadius: '50%',
-                      width: 32,
-                      height: 32,
+                      width: 30,
+                      height: 30,
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                       cursor: 'pointer',
                       zIndex: 10,
                       fontSize: '1.2rem',
-                      boxShadow: '0 4px 10px rgba(0,0,0,0.1)'
+                      boxShadow: '0 2px 5px rgba(0,0,0,0.1)'
                     }}
                     title={wishlistIds.has(it._id) ? "Remove from Wishlist" : "Add to Wishlist"}
                   >

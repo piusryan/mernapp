@@ -1,9 +1,17 @@
 import React from 'react';
 import './App.css';
-import { BrowserRouter } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
-import AnimatedRoutes from './components/AnimatedRoutes';
+import Login from './components/Login';
+import Items from './components/Items';
+import Cart from './components/Cart';
+import Payment from './components/Payment';
+import Home from './components/Home';
+import AdminDashboard from './components/AdminDashboard';
+import Track from './components/Track';
 import CookieConsent from './components/CookieConsent';
+import Wishlist from './components/Wishlist';
+import Profile from './components/Profile';
 
 function App() {
   const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
@@ -106,7 +114,17 @@ function App() {
   return (
     <BrowserRouter>
       <Navbar />
-      <AnimatedRoutes />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/items" element={<Items />} />
+        <Route path="/cart" element={<Cart />} />
+        <Route path="/wishlist" element={<Wishlist />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/payment" element={<Payment />} />
+        <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/track" element={<Track />} />
+      </Routes>
       {open && <CookieConsent onClose={()=>setOpen(false)} forceAccept={forceAccept} />}
     </BrowserRouter>
   );
