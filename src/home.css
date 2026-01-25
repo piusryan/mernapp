@@ -1427,7 +1427,6 @@ li { margin-bottom: 12px; font-size: 1.1rem; }
   animation: pagePush 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
   position: relative;
   min-height: 100vh;
-  background: #fdfdfd;
   width: 100%;
   overflow-x: hidden;
   transform: translateZ(0); /* Hardware acceleration */
