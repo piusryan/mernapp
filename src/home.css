@@ -1525,13 +1525,13 @@ body {
   display: flex;
   gap: 12px;
   margin-bottom: 24px;
-  background: linear-gradient(135deg, rgba(20, 22, 28, 0.6), rgba(40, 42, 48, 0.4));
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.6), rgba(240, 240, 240, 0.4));
   padding: 6px;
   border-radius: 999px;
   display: inline-flex;
   backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
 }
 
 .category-tab {
@@ -1539,28 +1539,28 @@ body {
   border-radius: 999px;
   border: none;
   background: transparent;
-  color: #aaa;
+  color: #555;
   font-weight: 600;
   font-size: 0.95rem;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
-  text-shadow: 0 1px 0 rgba(0,0,0,0.4);
+  text-shadow: none;
 }
 
 .category-tab:hover {
-  color: #fff;
-  background: rgba(255, 255, 255, 0.05);
-  box-shadow: inset 0 0 10px rgba(255,255,255,0.05);
+  color: #333;
+  background: rgba(0, 0, 0, 0.05);
+  box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
 }
 
 .category-tab.active {
-  background: linear-gradient(135deg, #3a3f4b, #2c3038);
-  color: #fff;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1);
+  background: linear-gradient(135deg, #e6e6e6, #d9d9d9);
+  color: #333;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.8);
   transform: translateY(-1px);
-  border: 1px solid rgba(255,255,255,0.15);
+  border: 1px solid rgba(0,0,0,0.1);
 }
 
 /* Modern Filter Bar */
@@ -1568,12 +1568,12 @@ body {
   display: flex;
   gap: 32px;
   align-items: center;
-  background: linear-gradient(135deg, rgba(30, 32, 38, 0.8), rgba(20, 22, 28, 0.6));
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(240, 240, 240, 0.6));
   backdrop-filter: blur(16px);
   padding: 16px 24px;
   border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
   margin-bottom: 32px;
   flex-wrap: wrap;
 }
@@ -1586,47 +1586,47 @@ body {
 
 .filter-label {
   font-weight: 700;
-  color: #bbb;
+  color: #555;
   font-size: 0.9rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   opacity: 0.9;
-  text-shadow: 0 1px 0 rgba(0,0,0,0.4);
+  text-shadow: none;
 }
 
 .modern-select {
   padding: 10px 16px;
   border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: linear-gradient(to bottom, #2a2c33, #1e2025);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  background: linear-gradient(to bottom, #ffffff, #f0f0f0);
   font-size: 0.95rem;
-  color: #e0e0e0;
+  color: #333;
   cursor: pointer;
   outline: none;
   transition: all 0.2s;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.05);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05), inset 0 1px 0 rgba(255,255,255,0.8);
 }
 
 .modern-select option {
-  background: #1e2025;
-  color: #e0e0e0;
+  background: #fff;
+  color: #333;
 }
 
 .modern-select:hover, .modern-select:focus {
-  border-color: #666;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  border-color: #999;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 
 .modern-range {
   -webkit-appearance: none;
   width: 200px;
   height: 6px;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.1);
   border-radius: 10px;
   outline: none;
   opacity: 0.8;
   transition: opacity .2s;
-  box-shadow: inset 0 1px 2px rgba(0,0,0,0.3);
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
 }
 
 .modern-range:hover {
@@ -1658,14 +1658,14 @@ body {
 }
 
 .price-badge {
-  background: #333;
-  color: #fff;
+  background: #eee;
+  color: #333;
   padding: 4px 10px;
   border-radius: 6px;
   font-size: 0.9rem;
   font-weight: 700;
   min-width: 60px;
   text-align: center;
-  border: 1px solid rgba(255,255,255,0.1);
+  border: 1px solid rgba(0,0,0,0.1);
 }
 
