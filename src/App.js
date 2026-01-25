@@ -10,6 +10,8 @@ import Home from './components/Home';
 import AdminDashboard from './components/AdminDashboard';
 import Track from './components/Track';
 import CookieConsent from './components/CookieConsent';
+import Wishlist from './components/Wishlist';
+import Profile from './components/Profile';
 
 function App() {
   const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
