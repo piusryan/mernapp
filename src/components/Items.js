@@ -402,7 +402,6 @@ export default function Items() {
                   <div className="actions">
                     <input
                       type="number"
-                      min={1}
                       value={qty[it._id] ?? 1}
                       onChange={(e) => {
                         const val = e.target.value
@@ -411,7 +410,7 @@ export default function Items() {
                           return
                         }
                         const v = Number(val)
-                        setQty((prev) => ({ ...prev, [it._id]: isNaN(v) ? 1 : Math.max(1, v) }))
+                        setQty((prev) => ({ ...prev, [it._id]: isNaN(v) ? 1 : Math.max(0, v) }))
                       }}
                       className="aj-qty"
                     />
