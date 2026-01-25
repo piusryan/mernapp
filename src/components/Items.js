@@ -140,7 +140,7 @@ export default function Items() {
     if (s === 'available') return '#0a7'
     if (s === 'limited') return '#d9a300'
     if (s === 'outofstock') return '#d33'
-    return '#555'
+    return '#ccc'
   }
 
   async function toggleReviews(item) {
