@@ -242,17 +242,19 @@ export default function Items() {
                       position: 'absolute',
                       top: 10,
                       right: 10,
-                      background: 'rgba(255,255,255,0.8)',
+                      background: 'rgba(255,255,255,0.25)',
+                      backdropFilter: 'blur(4px)',
+                      border: '1px solid rgba(255,255,255,0.4)',
                       borderRadius: '50%',
-                      width: 30,
-                      height: 30,
+                      width: 32,
+                      height: 32,
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                       cursor: 'pointer',
                       zIndex: 10,
                       fontSize: '1.2rem',
-                      boxShadow: '0 2px 5px rgba(0,0,0,0.1)'
+                      boxShadow: '0 4px 10px rgba(0,0,0,0.1)'
                     }}
                     title={wishlistIds.has(it._id) ? "Remove from Wishlist" : "Add to Wishlist"}
                   >
