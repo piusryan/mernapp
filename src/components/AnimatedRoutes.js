@@ -16,7 +16,6 @@ export default function AnimatedRoutes() {
 
   return (
     <div key={location.pathname} className="page-slide-container">
-      <div className="chicken-pusher">🐔</div>
       <Routes location={location}>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
