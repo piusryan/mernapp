@@ -16,8 +16,6 @@ const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN || 'http://localhost:3000';
 app.use(cors({
   origin: (origin, callback) => {
     const allowed = FRONTEND_ORIGIN.split(',').map(o => o.trim());
-    console.log('Incoming Request Origin:', origin); // DEBUG LOG
-    console.log('Allowed Origins:', allowed); // DEBUG LOG
     if (!origin || allowed.includes(origin)) {
       callback(null, true);
     } else {
