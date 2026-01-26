@@ -202,32 +202,6 @@ async function importItemsFromImages() {
   const rawDir = path.join(base, 'rawmeat');
   const processedDir = path.join(base, 'processsedfood');
 
-  // MIGRATION: Rename "Salami & Sausages" to "Chicken Salami" if needed
-  try {
-    const oldNameRegex = new RegExp('salami.*sausage', 'i')
-    const oldItem = await Item.findOne({ name: oldNameRegex })
-    if (oldItem) {
-      console.log('Found old Salami item:', oldItem.name)
-      // Check if "Chicken Salami" already exists
-      const newItem = await Item.findOne({ name: 'Chicken Salami' })
-      if (newItem) {
-        // If "Chicken Salami" already exists, we should delete the old one to avoid duplicates
-        // But we might want to migrate its history if the new one is fresh?
-        // For simplicity, if both exist, we keep the new one (imported from correct file) and drop the old one
-        console.log('Chicken Salami already exists. Deleting old Salami item.')
-        await Item.deleteOne({ _id: oldItem._id })
-      } else {
-        // Rename the old item to Chicken Salami
-        console.log('Renaming to Chicken Salami...')
-        oldItem.name = 'Chicken Salami'
-        oldItem.imagePath = '/images/processsedfood/chicken_salami.jpg'
-        await oldItem.save()
-      }
-    }
-  } catch (e) {
-    console.error('Salami migration failed:', e)
-  }
-
   const entries = [];
   function priceFor(category, file) {
     const f = file.toLowerCase();
