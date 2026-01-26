@@ -774,17 +774,7 @@ app.delete('/api/admin/reviews/:id', authMiddleware, async (req, res) => {
 })
 
 // File Upload Configuration
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    const dir = path.join(__dirname, 'imaages', 'uploads');
-    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-    cb(null, dir);
-  },
-  filename: function (req, file, cb) {
-    const ext = path.extname(file.originalname);
-    cb(null, 'upload-' + Date.now() + ext);
-  }
-});
+const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
 app.post('/api/admin/upload', authMiddleware, upload.single('image'), async (req, res) => {
@@ -793,9 +783,48 @@ app.post('/api/admin/upload', authMiddleware, upload.single('image'), async (req
     if (!me || me.role !== 'admin' || me.username !== 'AJadmin') return res.status(403).json({ error: 'Admin only' });
     if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
     
-    // Return the path relative to /images
-    const relativePath = `/images/uploads/${req.file.filename}`;
-    res.json({ path: relativePath });
+    const filename = 'upload-' + Date.now() + path.extname(req.file.originalname);
+    
+    // GitHub Upload Strategy (Permanent)
+    if (process.env.GITHUB_TOKEN) {
+      const owner = 'piusryan';
+      const repo = 'mernapp';
+      const filePath = `backend/imaages/uploads/${filename}`;
+      const content = req.file.buffer.toString('base64');
+      
+      const ghRes = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${filePath}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${process.env.GITHUB_TOKEN}`,
+          'Content-Type': 'application/json',
+          'User-Agent': 'MernApp-Admin'
+        },
+        body: JSON.stringify({
+          message: `upload: ${filename}`,
+          content: content,
+          branch: 'main' // Ensure we push to main
+        })
+      });
+      
+      if (!ghRes.ok) {
+        const err = await ghRes.json();
+        console.error('GitHub Upload Error:', err);
+        throw new Error('Failed to upload to GitHub');
+      }
+      
+      // Return the path relative to /images
+      // Note: It won't be visible until redeploy finishes (3-5 mins)
+      res.json({ path: `/images/uploads/${filename}`, method: 'github' });
+    } else {
+      // Local Disk Strategy (Temporary / Local Dev)
+      const dir = path.join(__dirname, 'imaages', 'uploads');
+      if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+      
+      const savePath = path.join(dir, filename);
+      fs.writeFileSync(savePath, req.file.buffer);
+      
+      res.json({ path: `/images/uploads/${filename}`, method: 'local' });
+    }
   } catch (e) {
     console.error('Upload failed', e);
     res.status(500).json({ error: 'Upload failed' });
