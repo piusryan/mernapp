@@ -60,7 +60,11 @@ export default function Navbar() {
       if (!res.ok) return alert(data.error || 'Create failed')
       alert('Item added')
       setShowAdmin(false)
-      navigate('/items')
+      if (window.location.pathname === '/items') {
+        window.location.reload()
+      } else {
+        navigate('/items')
+      }
     } catch (e) {
       alert(e.message)
     }
@@ -82,7 +86,11 @@ export default function Navbar() {
       if (!res.ok) return alert(data.error || 'Import failed')
       alert('Imported from images')
       setShowAdmin(false)
-      navigate('/items')
+      if (window.location.pathname === '/items') {
+        window.location.reload()
+      } else {
+        navigate('/items')
+      }
     } catch (e) {
       alert(e.message)
     }
