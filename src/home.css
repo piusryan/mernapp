@@ -1286,7 +1286,7 @@ li { margin-bottom: 12px; font-size: 1.1rem; }
 
 .order-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+  box-shadow: 0 10px 30px rgba(180, 173, 173, 0.06);
   border-color: rgba(255, 61, 127, 0.2);
   background: #cbc1c1;
 }
