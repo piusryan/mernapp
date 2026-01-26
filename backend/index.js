@@ -7,6 +7,7 @@ const fs = require('fs');
 const path = require('path');
 const { sendOtpEmail, sendOrderEmail } = require('./mailer');
 const Stripe = require('stripe');
+const multer = require('multer');
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -771,6 +772,35 @@ app.delete('/api/admin/reviews/:id', authMiddleware, async (req, res) => {
     res.status(500).json({ error: 'Delete review failed' })
   }
 })
+
+// File Upload Configuration
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    const dir = path.join(__dirname, 'imaages', 'uploads');
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    cb(null, dir);
+  },
+  filename: function (req, file, cb) {
+    const ext = path.extname(file.originalname);
+    cb(null, 'upload-' + Date.now() + ext);
+  }
+});
+const upload = multer({ storage: storage });
+
+app.post('/api/admin/upload', authMiddleware, upload.single('image'), async (req, res) => {
+  try {
+    const me = await User.findById(req.userId);
+    if (!me || me.role !== 'admin' || me.username !== 'AJadmin') return res.status(403).json({ error: 'Admin only' });
+    if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
+    
+    // Return the path relative to /images
+    const relativePath = `/images/uploads/${req.file.filename}`;
+    res.json({ path: relativePath });
+  } catch (e) {
+    console.error('Upload failed', e);
+    res.status(500).json({ error: 'Upload failed' });
+  }
+});
 
 app.post('/api/admin/items', authMiddleware, async (req, res) => {
   try {

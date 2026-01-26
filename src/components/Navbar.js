@@ -23,6 +23,29 @@ export default function Navbar() {
     const q = term.trim()
     navigate(q ? `/items?q=${encodeURIComponent(q)}` : '/items')
   }
+  async function handleFileUpload(e) {
+    const file = e.target.files[0]
+    if (!file) return
+    const formData = new FormData()
+    formData.append('image', file)
+    try {
+      const t = localStorage.getItem('token')
+      if (!t) return navigate('/login')
+      const res = await fetch(`${API_BASE}/api/admin/upload`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${t}` },
+        body: formData
+      })
+      if (res.status === 401) { localStorage.removeItem('token'); return navigate('/login') }
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Upload failed')
+      setAdminForm(p => ({ ...p, imagePath: data.path }))
+      alert('Image uploaded!')
+    } catch (e) {
+      alert(e.message)
+    }
+  }
+
   async function createItem() {
     try {
       const t = localStorage.getItem('token')
@@ -135,6 +158,8 @@ export default function Navbar() {
               <input className="auth-input" value={adminForm.price} onChange={(e)=>setAdminForm((p)=>({ ...p, price: e.target.value }))} />
               <label className="drawer-label">Image URL (optional)</label>
               <input className="auth-input" value={adminForm.imagePath} onChange={(e)=>setAdminForm((p)=>({ ...p, imagePath: e.target.value }))} />
+              <label className="drawer-label" style={{marginTop:8}}>Or Upload File</label>
+              <input type="file" className="auth-input" onChange={handleFileUpload} accept="image/*" />
             </div>
             <div className="drawer-actions">
               <button className="auth-btn" onClick={createItem}>Create</button>
