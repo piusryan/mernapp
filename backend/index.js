@@ -786,66 +786,82 @@ app.post('/api/admin/upload', authMiddleware, upload.single('image'), async (req
     
     const filename = 'upload-' + Date.now() + path.extname(req.file.originalname);
     
-    // Cloudinary Upload Strategy (Fastest & Best)
-    if (process.env.CLOUDINARY_URL) {
-      // Stream upload to Cloudinary
-      const result = await new Promise((resolve, reject) => {
-        const stream = cloudinary.uploader.upload_stream(
-          { folder: 'mernapp_uploads' },
-          (error, result) => {
-            if (error) reject(error);
-            else resolve(result);
-          }
-        );
-        stream.end(req.file.buffer);
-      });
-      
-      // Return the secure URL from Cloudinary
-      res.json({ path: result.secure_url, method: 'cloudinary' });
-    }
-    // GitHub Upload Strategy (Permanent but Slow)
-    else if (process.env.GITHUB_TOKEN) {
-      // Clean the token (remove quotes/spaces if user added them)
-      const rawToken = process.env.GITHUB_TOKEN.trim();
-      const token = rawToken.replace(/^["']|["']$/g, '');
+    // 1. ALWAYS Save locally first (Optimistic UI / Temporary Availability)
+    // This ensures the image is available immediately on the current server instance.
+    const dir = path.join(__dirname, 'imaages', 'uploads');
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    const localSavePath = path.join(dir, filename);
+    fs.writeFileSync(localSavePath, req.file.buffer);
+    
+    const localUrl = `/images/uploads/${filename}`;
 
-      const owner = 'piusryan';
-      const repo = 'mernapp';
-      const filePath = `backend/imaages/uploads/${filename}`;
-      const content = req.file.buffer.toString('base64');
-      
-      const ghRes = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${filePath}`, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-          'User-Agent': 'MernApp-Admin'
-        },
-        body: JSON.stringify({
-          message: `upload: ${filename}`,
-          content: content,
-          branch: 'main' // Ensure we push to main
-        })
-      });
-      
-      if (!ghRes.ok) {
-        const err = await ghRes.json();
-        console.error('GitHub Upload Error:', err);
-        throw new Error('Failed to upload to GitHub');
+    // 2. Cloudinary Strategy (Best: Instant & Permanent)
+    if (process.env.CLOUDINARY_URL) {
+      try {
+        const result = await new Promise((resolve, reject) => {
+          const stream = cloudinary.uploader.upload_stream(
+            { folder: 'mernapp_uploads' },
+            (error, result) => {
+              if (error) reject(error);
+              else resolve(result);
+            }
+          );
+          stream.end(req.file.buffer);
+        });
+        // Return the secure URL from Cloudinary
+        res.json({ path: result.secure_url, method: 'cloudinary' });
+      } catch (err) {
+        console.error('Cloudinary Upload Error:', err);
+        // Fallback to local URL if Cloudinary fails
+        res.json({ path: localUrl, method: 'local_fallback' });
       }
-      
-      // Return the path relative to /images
-      // Note: It won't be visible until redeploy finishes (3-5 mins)
-      res.json({ path: `/images/uploads/${filename}`, method: 'github' });
-    } else {
-      // Local Disk Strategy (Temporary / Local Dev)
-      const dir = path.join(__dirname, 'imaages', 'uploads');
-      if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-      
-      const savePath = path.join(dir, filename);
-      fs.writeFileSync(savePath, req.file.buffer);
-      
-      res.json({ path: `/images/uploads/${filename}`, method: 'local' });
+    }
+    // 3. GitHub Strategy (Hybrid: Immediate Local + Background Permanent)
+    else if (process.env.GITHUB_TOKEN) {
+      // Return the local URL immediately so the user sees the image NOW.
+      res.json({ path: localUrl, method: 'github_hybrid' });
+
+      // Trigger GitHub upload in background (Fire-and-Forget)
+      // This will trigger a redeploy. When the new server starts ~5 mins later,
+      // the image will be part of the repo and served from the same path.
+      (async () => {
+        try {
+          console.log(`[Background] Starting GitHub upload for ${filename}...`);
+          const rawToken = process.env.GITHUB_TOKEN.trim();
+          const token = rawToken.replace(/^["']|["']$/g, '');
+          const owner = 'piusryan';
+          const repo = 'mernapp';
+          const filePath = `backend/imaages/uploads/${filename}`;
+          const content = req.file.buffer.toString('base64');
+          
+          const ghRes = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${filePath}`, {
+            method: 'PUT',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json',
+              'User-Agent': 'MernApp-Admin'
+            },
+            body: JSON.stringify({
+              message: `upload: ${filename}`,
+              content: content,
+              branch: 'main'
+            })
+          });
+
+          if (!ghRes.ok) {
+            const err = await ghRes.json();
+            console.error('[Background] GitHub Upload Failed:', err);
+          } else {
+            console.log(`[Background] GitHub Upload Success for ${filename}. Redeploy triggered.`);
+          }
+        } catch (err) {
+          console.error('[Background] GitHub Upload Exception:', err);
+        }
+      })();
+    } 
+    // 4. Local Only (Dev Mode)
+    else {
+      res.json({ path: localUrl, method: 'local' });
     }
   } catch (e) {
     console.error('Upload failed', e);
