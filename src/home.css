@@ -1277,18 +1277,18 @@ li { margin-bottom: 12px; font-size: 1.1rem; }
 }
 
 .order-card {
-  border: 1px solid #595353;
+  border: 1px solid #828080;
   border-radius: 16px;
   padding: 20px;
   transition: all 0.2s ease;
-  background: #100f0f;
+  background: #707070;
 }
 
 .order-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 10px 30px rgba(0,0,0,0.06);
   border-color: rgba(255, 61, 127, 0.2);
-  background: #1d1c1c;
+  background: #a19c9c;
 }
 
 .order-header {
@@ -1302,7 +1302,7 @@ li { margin-bottom: 12px; font-size: 1.1rem; }
 
 .order-id {
   font-weight: 700;
-  color: #24121f;
+  color: #9e7793;
   font-family: monospace;
   font-size: 1.1rem;
 }
