@@ -787,6 +787,10 @@ app.post('/api/admin/upload', authMiddleware, upload.single('image'), async (req
     
     // GitHub Upload Strategy (Permanent)
     if (process.env.GITHUB_TOKEN) {
+      // Clean the token (remove quotes/spaces if user added them)
+      const rawToken = process.env.GITHUB_TOKEN.trim();
+      const token = rawToken.replace(/^["']|["']$/g, '');
+
       const owner = 'piusryan';
       const repo = 'mernapp';
       const filePath = `backend/imaages/uploads/${filename}`;
@@ -795,7 +799,7 @@ app.post('/api/admin/upload', authMiddleware, upload.single('image'), async (req
       const ghRes = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${filePath}`, {
         method: 'PUT',
         headers: {
-          'Authorization': `Bearer ${process.env.GITHUB_TOKEN}`,
+          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
           'User-Agent': 'MernApp-Admin'
         },
