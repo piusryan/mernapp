@@ -296,6 +296,11 @@ function authMiddleware(req, res, next) {
   }
 }
 
+function adminMiddleware(req, res, next) {
+  if (req.userRole !== 'admin') return res.status(403).json({ error: 'Admin access required' });
+  next();
+}
+
 app.get('/', (req, res) => {
   res.json({ ok: true, message: 'Food ordering API running' });
 });
@@ -917,6 +922,19 @@ app.post('/api/admin/items', authMiddleware, async (req, res) => {
     res.status(500).json({ error: 'Create item failed' })
   }
 })
+
+app.get('/api/admin/carts', authMiddleware, adminMiddleware, async (req, res) => {
+  try {
+    // Find carts that have items
+    const carts = await Cart.find({ 'items.0': { $exists: true } })
+      .populate('userId', 'username email')
+      .sort({ updatedAt: -1 });
+    res.json(carts);
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: 'Failed to fetch active carts' });
+  }
+});
 
 app.put('/api/admin/items/:id', authMiddleware, async (req, res) => {
   try {

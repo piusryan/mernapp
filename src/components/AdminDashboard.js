@@ -163,6 +163,28 @@ export default function AdminDashboard() {
           <div style={{ fontSize: 28, fontWeight:700 }}>₹{Number(stats.revenueTotal||0).toFixed(0)}</div>
         </div>
       </div>
+
+      <h3 style={{ marginTop: 16 }}>Live Shopping Monitor (Active Carts)</h3>
+      <div className="item-card" style={{ padding: 16 }}>
+        {activeCarts.length === 0 && <div style={{ color: '#555' }}>No active shoppers right now.</div>}
+        {activeCarts.map(c => (
+          <div key={c._id} style={{ borderBottom: '1px solid #eee', paddingBottom: 8, marginBottom: 8 }}>
+            <div style={{ fontWeight: 600, color: '#0a7' }}>
+              {c.userId?.username || 'Unknown User'}
+              <span style={{ fontSize: 12, color: '#888', marginLeft: 8 }}>
+                ({new Date(c.updatedAt).toLocaleTimeString()})
+              </span>
+            </div>
+            <div style={{ fontSize: 13, color: '#444', marginTop: 4 }}>
+              {c.items.map(i => `${i.name} (x${i.quantity})`).join(', ')}
+            </div>
+            <div style={{ textAlign: 'right', fontWeight: 700, fontSize: 14 }}>
+              Potential: ₹{c.items.reduce((s, i) => s + (i.price * i.quantity), 0)}
+            </div>
+          </div>
+        ))}
+      </div>
+
       <div className="item-card" style={{ padding: 12, marginTop: 8 }}>
         <div style={{ display:'flex', alignItems:'center', gap:8 }}>
           <span style={{ fontWeight:600 }}>Legend:</span>
