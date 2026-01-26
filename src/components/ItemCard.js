@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { API_BASE } from '../api'
 
 export default function ItemCard({ 
@@ -28,13 +28,6 @@ export default function ItemCard({
     const p = it.imagePath || ''
     if (!p) return ''
     return p.startsWith('http') ? p : `${API_BASE}${p}`
-  }
-
-  function statusColor(s) {
-    if (s === 'available') return '#0a7'
-    if (s === 'limited') return '#d9a300'
-    if (s === 'outofstock') return '#d33'
-    return '#555'
   }
 
   return (

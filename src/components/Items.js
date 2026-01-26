@@ -29,11 +29,6 @@ export default function Items() {
       isAdmin = payload && payload.role === 'admin' && payload.username === 'AJadmin'
     } catch {}
   }
-  function srcFor(it) {
-    const p = it.imagePath || ''
-    if (!p) return ''
-    return p.startsWith('http') ? p : `${API_BASE}${p}`
-  }
 
   useEffect(() => {
     const url = query ? `${API_BASE}/api/items?q=${encodeURIComponent(query)}` : `${API_BASE}/api/items`
@@ -136,12 +131,6 @@ export default function Items() {
     } catch (e) {
       setError(e.message)
     }
-  }
-  function statusColor(s) {
-    if (s === 'available') return '#0a7'
-    if (s === 'limited') return '#d9a300'
-    if (s === 'outofstock') return '#d33'
-    return '#555'
   }
 
   async function toggleReviews(item) {
