@@ -1277,18 +1277,18 @@ li { margin-bottom: 12px; font-size: 1.1rem; }
 }
 
 .order-card {
-  border: 1px solid #828080;
+  border: 1px solid #a79898;
   border-radius: 16px;
   padding: 20px;
   transition: all 0.2s ease;
-  background: #707070;
+  background: #e8e4e4;
 }
 
 .order-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 10px 30px rgba(0,0,0,0.06);
   border-color: rgba(255, 61, 127, 0.2);
-  background: #a19c9c;
+  background: #cbc1c1;
 }
 
 .order-header {
