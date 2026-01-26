@@ -261,538 +261,89 @@ export default function Items() {
             <h3 className="section-title">Raw Meat</h3>
             <div className="items-grid">
               {getVisibleItems('raw').map((it) => (
-                <div key={it._id} className="item-card modern-card">
-                  <div 
-                    onClick={() => toggleWishlist(it._id)}
-                    className="wishlist-btn"
-                    title={wishlistIds.has(it._id) ? "Remove from Wishlist" : "Add to Wishlist"}
-                  >
-                    {wishlistIds.has(it._id) ? '❤️' : '🤍'}
-                  </div>
-                  <div className="card-img-wrapper">
-                    {srcFor(it) ? (
-                      <img src={srcFor(it)} alt={it.name} />
-                    ) : <div className="placeholder-img" />}
-                  </div>
-                  <div className="card-content">
-                    <div className="card-header">
-                      <div className="item-name">{it.name}</div>
-                      <span className={`status-badge status-${it.stockStatus || 'available'}`}>
-                        {(it.stockStatus || 'available') === 'available' ? 'In Stock' : (it.stockStatus || 'available')}
-                      </span>
-                    </div>
-                    <div className="price-rating-row">
-                      <span className="price-tag">₹{it.price}</span>
-                      <span className="rating-pill">⭐ {Number(it.ratingAvg||0).toFixed(1)} ({it.ratingCount||0})</span>
-                    </div>
-                    <div className="item-desc">
-                      {(it.grams||it.pieces||it.serves) ? (
-                        <span className="item-specs">
-                          {it.grams ? `${it.grams} g` : ''} {it.pieces ? `• ${it.pieces} pcs` : ''} {it.serves ? `• serves ${it.serves}` : ''}
-                        </span>
-                      ) : null}
-                      {it.description ? <div className="item-desc-text">{it.description}</div> : null}
-                    </div>
-                    
-                    {/* Admin Actions */}
-                    {isAdmin && !editing[it._id] && (
-                      <div className="admin-actions">
-                        <button className="btn-sm btn-edit" onClick={()=>setEditing((p)=>({ ...p, [it._id]: { name: it.name, price: it.price, category: it.category, imagePath: it.imagePath || '', description: it.description || '', grams: it.grams || 0, pieces: it.pieces || 0, serves: it.serves || 0 } }))}>Edit</button>
-                        <button className="btn-sm btn-delete" onClick={async()=>{
-                          const ok = window.confirm('Delete this item?')
-                          if (!ok) return
-                          const t = localStorage.getItem('token')
-                          if (!t) return navigate('/login')
-                          const res = await fetch(`${API_BASE}/api/admin/items/${it._id}`, { method:'DELETE', headers: { Authorization: `Bearer ${t}` } })
-                          if (res.status === 401) { localStorage.removeItem('token'); return navigate('/login') }
-                          const data = await res.json()
-                          if (!res.ok) return alert(data.error || 'Delete failed')
-                          const url = query ? `${API_BASE}/api/items?q=${encodeURIComponent(query)}` : `${API_BASE}/api/items`
-                          fetch(url).then((r)=>r.json()).then(setItems).catch(()=>{})
-                        }}>Delete</button>
-                        <div className="stock-controls">
-                          <button className={`btn-stock ${it.stockStatus === 'available' ? 'active' : ''}`} onClick={()=>updateStatus(it._id, 'available')}>In Stock</button>
-                          <button className={`btn-stock ${it.stockStatus === 'limited' ? 'active' : ''}`} onClick={()=>updateStatus(it._id, 'limited')}>Low</button>
-                          <button className={`btn-stock ${it.stockStatus === 'outofstock' ? 'active' : ''}`} onClick={()=>updateStatus(it._id, 'outofstock')}>Out</button>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Edit Mode */}
-                    {isAdmin && editing[it._id] && (
-                      <div className="edit-form">
-                        <div className="form-row">
-                          <select className="form-input" value={editing[it._id].category} onChange={(e)=>setEditing((p)=>({ ...p, [it._id]: { ...p[it._id], category: e.target.value } }))}>
-                            <option value="raw">raw</option>
-                            <option value="processed">processed</option>
-                          </select>
-                          <input className="form-input" placeholder="Name" value={editing[it._id].name} onChange={(e)=>setEditing((p)=>({ ...p, [it._id]: { ...p[it._id], name: e.target.value } }))} />
-                          <input className="form-input" placeholder="Price" value={editing[it._id].price} onChange={(e)=>setEditing((p)=>({ ...p, [it._id]: { ...p[it._id], price: e.target.value } }))} />
-                        </div>
-                        {/* Simplified edit form for brevity in this update, assuming other fields are similar */}
-                        <div className="form-actions">
-                          <button className="btn-save" onClick={async()=>{
-                            const t = localStorage.getItem('token')
-                            if (!t) return navigate('/login')
-                            const body = editing[it._id]
-                            const res = await fetch(`${API_BASE}/api/admin/items/${it._id}`, {
-                              method:'PUT',
-                              headers: { 'Content-Type':'application/json', Authorization: `Bearer ${t}` },
-                              body: JSON.stringify(body)
-                            })
-                            if (res.status === 401) { localStorage.removeItem('token'); return navigate('/login') }
-                            const data = await res.json()
-                            if (!res.ok) return alert(data.error || 'Update failed')
-                            setEditing((p)=>({ ...p, [it._id]: null }))
-                            const url = query ? `${API_BASE}/api/items?q=${encodeURIComponent(query)}` : `${API_BASE}/api/items`
-                            fetch(url).then((r)=>r.json()).then(setItems).catch(()=>{})
-                          }}>Save</button>
-                          <button className="btn-cancel" onClick={()=>setEditing((p)=>({ ...p, [it._id]: null }))}>Cancel</button>
-                        </div>
-                      </div>
-                    )}
-
-                    <div className="card-actions">
-                      <div className="qty-wrapper">
-                        <button className="qty-btn" onClick={() => setQty(prev => ({ ...prev, [it._id]: Math.max(1, (prev[it._id] || 1) - 1) }))}>-</button>
-                        <input
-                          type="number"
-                          value={qty[it._id] ?? 1}
-                          onChange={(e) => {
-                            const val = e.target.value
-                            const v = Number(val)
-                            setQty((prev) => ({ ...prev, [it._id]: isNaN(v) ? 1 : Math.max(0, v) }))
-                          }}
-                          className="qty-input"
-                        />
-                        <button className="qty-btn" onClick={() => setQty(prev => ({ ...prev, [it._id]: (prev[it._id] || 1) + 1 }))}>+</button>
-                      </div>
-                      {((it.stockStatus || 'available') !== 'outofstock') && (
-                        <button className="add-cart-btn" onClick={() => addToCart(it._id)}>
-                          Add to Cart
-                        </button>
-                      )}
-                    </div>
-                  
-                    <div className="review-toggle" onClick={()=>toggleReviews(it)}>
-                      <span>Reviews</span>
-                      <span className="chev">{expanded[it._id] ? '▴' : '▾'}</span>
-                    </div>
-                    
-                    {expanded[it._id] && (
-                      <div className="reviews-container">
-                        {/* Review content stays mostly same but wrapped nicely */}
-                        {(!reviews[it._id] || reviews[it._id].reviews.length === 0) && <p className="no-reviews">No reviews yet</p>}
-                        {reviews[it._id] && reviews[it._id].reviews.map((r) => (
-                          <div className="review-item" key={r._id}>
-                             <div className="review-header">
-                               <span className="review-stars">{'⭐'.repeat(r.rating)}</span>
-                               <span className="review-user">{r.username}</span>
-                             </div>
-                             <p className="review-body">{r.comment}</p>
-                             <span className="review-date">{new Date(r.createdAt).toLocaleDateString()}</span>
-                          </div>
-                        ))}
-                         {/* Add Review Form */}
-                         <div className="add-review-box">
-                            <input 
-                              placeholder="Add a review..." 
-                              className="review-input-text"
-                              value={(reviewInputs[it._id] || {}).comment || ''}
-                              onChange={e => setReviewInputs(p => ({...p, [it._id]: {...(p[it._id]||{}), comment: e.target.value}}))}
-                            />
-                            <div className="review-submit-row">
-                               <select 
-                                 className="rating-select"
-                                 value={(reviewInputs[it._id] || {}).rating || 5}
-                                 onChange={e => setReviewInputs(p => ({...p, [it._id]: {...(p[it._id]||{}), rating: Number(e.target.value)}}))}
-                               >
-                                 {[5,4,3,2,1].map(n => <option key={n} value={n}>{n} Stars</option>)}
-                               </select>
-                               <button className="btn-submit-review" onClick={() => submitReviewInline(it._id)}>Post</button>
-                            </div>
-                         </div>
-                      </div>
-                    )}
-                  </div> {/* Closing card-content */}
-                      <div className="review-form">
-                        <select
-                          value={(reviewInputs[it._id]?.rating) ?? 5}
-                          onChange={(e)=>setReviewInputs((p)=>({ ...p, [it._id]: { ...(p[it._id]||{ rating:5, comment:'' }), rating: Number(e.target.value) } }))}
-                        >
-                          {[1,2,3,4,5].map(n=> <option key={n} value={n}>{n}</option>)}
-                        </select>
-                        <input
-                          className="review-input"
-                          placeholder="Share your experience"
-                          value={(reviewInputs[it._id]?.comment) ?? ''}
-                          onChange={(e)=>setReviewInputs((p)=>({ ...p, [it._id]: { ...(p[it._id]||{ rating:5, comment:'' }), comment: e.target.value } }))}
-                        />
-                        <button className="btn-modern" onClick={()=>submitReviewInline(it._id)}>Submit</button>
-                      </div>
-                    </div>
-                  )}
-                </div>
+                <ItemCard 
+                  key={it._id} 
+                  it={it} 
+                  wishlistIds={wishlistIds} 
+                  toggleWishlist={toggleWishlist} 
+                  addToCart={addToCart} 
+                  qty={qty} 
+                  setQty={setQty} 
+                  isAdmin={isAdmin} 
+                  editing={editing} 
+                  setEditing={setEditing} 
+                  updateStatus={updateStatus} 
+                  expanded={expanded} 
+                  toggleReviews={toggleReviews} 
+                  reviews={reviews} 
+                  reviewInputs={reviewInputs} 
+                  setReviewInputs={setReviewInputs} 
+                  submitReviewInline={submitReviewInline}
+                  deleteReview={deleteReview}
+                  navigate={navigate}
+                  query={query}
+                  setItems={setItems}
+                />
               ))}
             </div>
           </div>
-          <div>
-            <h3>Processed Meat</h3>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 12 }}>
-              {items.filter((i) => i.category === 'processed').map((it) => (
-                <div key={it._id} className="item-card" style={{ padding: 12, position: 'relative' }}>
-                  <div 
-                    onClick={() => toggleWishlist(it._id)}
-                    style={{
-                      position: 'absolute',
-                      top: 10,
-                      right: 10,
-                      background: 'rgba(255,255,255,0.8)',
-                      borderRadius: '50%',
-                      width: 30,
-                      height: 30,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      cursor: 'pointer',
-                      zIndex: 10,
-                      fontSize: '1.2rem',
-                      boxShadow: '0 2px 5px rgba(0,0,0,0.1)'
-                    }}
-                    title={wishlistIds.has(it._id) ? "Remove from Wishlist" : "Add to Wishlist"}
-                  >
-                    {wishlistIds.has(it._id) ? '❤️' : '🤍'}
-                  </div>
-                  {srcFor(it) ? (
-                    <img src={srcFor(it)} alt={it.name} style={{ width: '100%', height: 140, objectFit: 'cover', borderRadius: 6 }} />
-                  ) : <div style={{ width:'100%', height:140, background:'#f5f5f5', borderRadius:6 }} />}
-                  <div style={{ fontWeight: 600, marginTop: 8 }}>{it.name}</div>
-                  <div style={{ marginTop: 4 }}>
-                    <span style={{ color: statusColor(it.stockStatus || 'available'), fontWeight: 600 }}>
-                      {(it.stockStatus || 'available') === 'available' ? 'available' : (it.stockStatus || 'available')}
-                    </span>
-                  </div>
-                  <div style={{ marginTop: 4, display:'flex', justifyContent:'space-between', alignItems:'center' }}>
-                    <span>₹{it.price}</span>
-                    <span className="rating-badge">⭐ {Number(it.ratingAvg||0).toFixed(1)} ({it.ratingCount||0})</span>
-                  </div>
-                  <div className="item-desc">
-                    {(it.grams||it.pieces||it.serves) ? (
-                      <span>
-                        {it.grams ? `${it.grams} g` : ''} {it.pieces ? `• ${it.pieces} pcs` : ''} {it.serves ? `• serves ${it.serves}` : ''}
-                      </span>
-                    ) : null}
-                    {it.description ? <div className="item-desc-text">{it.description}</div> : null}
-                  </div>
-                  {isAdmin && !editing[it._id] && (
-                    <div className="actions">
-                      <button className="btn-modern" onClick={()=>setEditing((p)=>({ ...p, [it._id]: { name: it.name, price: it.price, category: it.category, imagePath: it.imagePath || '', description: it.description || '', grams: it.grams || 0, pieces: it.pieces || 0, serves: it.serves || 0 } }))}>Edit</button>
-                      <button className="btn-modern" onClick={async()=>{
-                        const ok = window.confirm('Delete this item?')
-                        if (!ok) return
-                        const t = localStorage.getItem('token')
-                        if (!t) return navigate('/login')
-                        const res = await fetch(`${API_BASE}/api/admin/items/${it._id}`, { method:'DELETE', headers: { Authorization: `Bearer ${t}` } })
-                        if (res.status === 401) { localStorage.removeItem('token'); return navigate('/login') }
-                        const data = await res.json()
-                        if (!res.ok) return alert(data.error || 'Delete failed')
-                        const url = query ? `${API_BASE}/api/items?q=${encodeURIComponent(query)}` : `${API_BASE}/api/items`
-                        fetch(url).then((r)=>r.json()).then(setItems).catch(()=>{})
-                      }}>Delete</button>
-                      <div style={{ marginTop: 8, display: 'flex', gap: 6 }}>
-                        <button className="btn-modern" style={{ color: '#0a7' }} onClick={()=>updateStatus(it._id, 'available')} disabled={(it.stockStatus||'available')==='available'}>available</button>
-                        <button className="btn-modern" style={{ color: '#d9a300' }} onClick={()=>updateStatus(it._id, 'limited')} disabled={(it.stockStatus||'available')==='limited'}>limited</button>
-                        <button className="btn-modern" style={{ color: '#d33' }} onClick={()=>updateStatus(it._id, 'outofstock')} disabled={(it.stockStatus||'available')==='outofstock'}>outofstock</button>
-                      </div>
-                    </div>
-                  )}
-                  {isAdmin && editing[it._id] && (
-                    <div className="review-section">
-                      <div className="review-form">
-                        <select value={editing[it._id].category} onChange={(e)=>setEditing((p)=>({ ...p, [it._id]: { ...p[it._id], category: e.target.value } }))}>
-                          <option value="raw">raw</option>
-                          <option value="processed">processed</option>
-                        </select>
-                        <input className="review-input" placeholder="Name" value={editing[it._id].name} onChange={(e)=>setEditing((p)=>({ ...p, [it._id]: { ...p[it._id], name: e.target.value } }))} />
-                        <input className="review-input" placeholder="Price" value={editing[it._id].price} onChange={(e)=>setEditing((p)=>({ ...p, [it._id]: { ...p[it._id], price: e.target.value } }))} />
-                      </div>
-                      <div className="review-form">
-                        <input className="review-input" placeholder="Image URL" value={editing[it._id].imagePath} onChange={(e)=>setEditing((p)=>({ ...p, [it._id]: { ...p[it._id], imagePath: e.target.value } }))} />
-                      </div>
-                      <div className="review-form">
-                        <input className="review-input" type="number" min={0} placeholder="grams" value={editing[it._id].grams} onChange={(e)=>setEditing((p)=>({ ...p, [it._id]: { ...p[it._id], grams: Number(e.target.value) } }))} />
-                        <input className="review-input" type="number" min={0} placeholder="pieces" value={editing[it._id].pieces} onChange={(e)=>setEditing((p)=>({ ...p, [it._id]: { ...p[it._id], pieces: Number(e.target.value) } }))} />
-                        <input className="review-input" type="number" min={0} placeholder="serves" value={editing[it._id].serves} onChange={(e)=>setEditing((p)=>({ ...p, [it._id]: { ...p[it._id], serves: Number(e.target.value) } }))} />
-                      </div>
-                      <div className="review-form">
-                        <textarea className="review-input" rows={3} placeholder="Description" value={editing[it._id].description} onChange={(e)=>setEditing((p)=>({ ...p, [it._id]: { ...p[it._id], description: e.target.value } }))} />
-                      </div>
-                      <div className="actions">
-                        <button className="auth-btn" onClick={async()=>{
-                          const t = localStorage.getItem('token')
-                          if (!t) return navigate('/login')
-                          const body = editing[it._id]
-                          const res = await fetch(`${API_BASE}/api/admin/items/${it._id}`, {
-                            method:'PUT',
-                            headers: { 'Content-Type':'application/json', Authorization: `Bearer ${t}` },
-                            body: JSON.stringify(body)
-                          })
-                          if (res.status === 401) { localStorage.removeItem('token'); return navigate('/login') }
-                          const data = await res.json()
-                          if (!res.ok) return alert(data.error || 'Update failed')
-                          setEditing((p)=>({ ...p, [it._id]: null }))
-                          const url = query ? `${API_BASE}/api/items?q=${encodeURIComponent(query)}` : `${API_BASE}/api/items`
-                          fetch(url).then((r)=>r.json()).then(setItems).catch(()=>{})
-                        }}>Save</button>
-                        <button className="btn-modern" onClick={()=>setEditing((p)=>({ ...p, [it._id]: null }))}>Cancel</button>
-                      </div>
-                    </div>
-                  )}
-                  <div className="actions">
-                    <input
-                      type="number"
-                      value={qty[it._id] ?? 1}
-                      onChange={(e) => {
-                        const val = e.target.value
-                        if (val === '') {
-                          setQty((prev) => ({ ...prev, [it._id]: '' }))
-                          return
-                        }
-                        const v = Number(val)
-                        setQty((prev) => ({ ...prev, [it._id]: isNaN(v) ? 1 : Math.max(0, v) }))
-                      }}
-                      className="aj-qty"
-                    />
-                    {((it.stockStatus || 'available') !== 'outofstock') && (
-                      <button className="aj-cta" onClick={() => addToCart(it._id)}>Add to cart</button>
-                    )}
-                  </div>
-                  <div className="review-toggle" onClick={()=>toggleReviews(it)}>
-                    <span>Reviews</span>
-                    <span className="rating-badge">⭐ {Number(it.ratingAvg||0).toFixed(1)} ({it.ratingCount||0})</span>
-                    <span className="chev">{expanded[it._id] ? '▴' : '▾'}</span>
-                  </div>
-                  {expanded[it._id] && (
-                    <div className="review-section">
-                      {(!reviews[it._id] || reviews[it._id].reviews.length === 0) && <p>No reviews yet</p>}
-                      {reviews[it._id] && reviews[it._id].reviews.map((r) => (
-                      <div className="review-item">
-                        <div className="review-head">⭐ {r.rating} — {r.username}</div>
-                        {r.comment && <div className="review-text">{r.comment}</div>}
-                        <div className="review-date">{new Date(r.createdAt).toLocaleString()}</div>
-                        {isAdmin && (
-                          <button
-                            className="btn-modern"
-                            onClick={async ()=>{
-                              const t = localStorage.getItem('token')
-                              if (!t) return navigate('/login')
-                              const del = await fetch(`${API_BASE}/api/admin/reviews/${r._id}`, { method: 'DELETE', headers: { Authorization: `Bearer ${t}` } })
-                              if (del.status === 401) { localStorage.removeItem('token'); return navigate('/login') }
-                              if (!del.ok) { const dd = await del.json(); return alert(dd.error || 'Delete failed') }
-                              const r2 = await fetch(`${API_BASE}/api/items/${it._id}/reviews`)
-                              const d2 = await r2.json()
-                              setReviews((p)=>({ ...p, [it._id]: d2 }))
-                              const url = query ? `${API_BASE}/api/items?q=${encodeURIComponent(query)}` : `${API_BASE}/api/items`
-                              fetch(url).then((r)=>r.json()).then(setItems).catch(()=>{})
-                            }}
-                          >
-                            Delete
-                          </button>
-                        )}
-                      </div>
-                    ))}
-                      <div className="review-form">
-                        <select
-                          value={(reviewInputs[it._id]?.rating) ?? 5}
-                          onChange={(e)=>setReviewInputs((p)=>({ ...p, [it._id]: { ...(p[it._id]||{ rating:5, comment:'' }), rating: Number(e.target.value) } }))}
-                        >
-                          {[1,2,3,4,5].map(n=> <option key={n} value={n}>{n}</option>)}
-                        </select>
-                        <input
-                          className="review-input"
-                          placeholder="Share your experience"
-                          value={(reviewInputs[it._id]?.comment) ?? ''}
-                          onChange={(e)=>setReviewInputs((p)=>({ ...p, [it._id]: { ...(p[it._id]||{ rating:5, comment:'' }), comment: e.target.value } }))}
-                        />
-                        <button className="btn-modern" onClick={()=>submitReviewInline(it._id)}>Submit</button>
-                      </div>
-                    </div>
-                  )}
-                </div>
+          <div className="category-section">
+            <h3 className="section-title">Processed Meat</h3>
+            <div className="items-grid">
+              {getVisibleItems('processed').map((it) => (
+                <ItemCard 
+                  key={it._id} 
+                  it={it} 
+                  wishlistIds={wishlistIds} 
+                  toggleWishlist={toggleWishlist} 
+                  addToCart={addToCart} 
+                  qty={qty} 
+                  setQty={setQty} 
+                  isAdmin={isAdmin} 
+                  editing={editing} 
+                  setEditing={setEditing} 
+                  updateStatus={updateStatus} 
+                  expanded={expanded} 
+                  toggleReviews={toggleReviews} 
+                  reviews={reviews} 
+                  reviewInputs={reviewInputs} 
+                  setReviewInputs={setReviewInputs} 
+                  submitReviewInline={submitReviewInline}
+                  deleteReview={deleteReview}
+                  navigate={navigate}
+                  query={query}
+                  setItems={setItems}
+                />
               ))}
             </div>
           </div>
         </div>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 12 }}>
+        <div className="items-grid">
           {getVisibleItems(view === 'raw' ? 'raw' : 'processed').map((it) => (
-            <div key={it._id} className="item-card" style={{ padding: 12, position: 'relative' }}>
-                  <div 
-                    onClick={() => toggleWishlist(it._id)}
-                    style={{
-                      position: 'absolute',
-                      top: 10,
-                      right: 10,
-                      background: 'rgba(255,255,255,0.8)',
-                      borderRadius: '50%',
-                      width: 30,
-                      height: 30,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      cursor: 'pointer',
-                      zIndex: 10,
-                      fontSize: '1.2rem',
-                      boxShadow: '0 2px 5px rgba(0,0,0,0.1)'
-                    }}
-                    title={wishlistIds.has(it._id) ? "Remove from Wishlist" : "Add to Wishlist"}
-                  >
-                    {wishlistIds.has(it._id) ? '❤️' : '🤍'}
-                  </div>
-              {srcFor(it) ? (
-                <img src={srcFor(it)} alt={it.name} style={{ width: '100%', height: 140, objectFit: 'cover', borderRadius: 6 }} />
-              ) : <div style={{ width:'100%', height:140, background:'#f5f5f5', borderRadius:6 }} />}
-              <div style={{ fontWeight: 600, marginTop: 8 }}>{it.name}</div>
-              <div style={{ marginTop: 4, display:'flex', justifyContent:'space-between', alignItems:'center' }}>
-                <span>₹{it.price}</span>
-                <span className="rating-badge">⭐ {Number(it.ratingAvg||0).toFixed(1)} ({it.ratingCount||0})</span>
-              </div>
-              <div className="item-desc">
-                {(it.grams||it.pieces||it.serves) ? (
-                  <span>
-                    {it.grams ? `${it.grams} g` : ''} {it.pieces ? `• ${it.pieces} pcs` : ''} {it.serves ? `• serves ${it.serves}` : ''}
-                  </span>
-                ) : null}
-                {it.description ? <div className="item-desc-text">{it.description}</div> : null}
-              </div>
-              {isAdmin && !editing[it._id] && (
-                <div className="actions">
-                  <button className="btn-modern" onClick={()=>setEditing((p)=>({ ...p, [it._id]: { name: it.name, price: it.price, category: it.category, imagePath: it.imagePath || '', description: it.description || '', grams: it.grams || 0, pieces: it.pieces || 0, serves: it.serves || 0 } }))}>Edit</button>
-                  <button className="btn-modern" onClick={async()=>{
-                    const ok = window.confirm('Delete this item?')
-                    if (!ok) return
-                    const t = localStorage.getItem('token')
-                    if (!t) return navigate('/login')
-                    const res = await fetch(`${API_BASE}/api/admin/items/${it._id}`, { method:'DELETE', headers: { Authorization: `Bearer ${t}` } })
-                    if (res.status === 401) { localStorage.removeItem('token'); return navigate('/login') }
-                    const data = await res.json()
-                    if (!res.ok) return alert(data.error || 'Delete failed')
-                    const url = query ? `${API_BASE}/api/items?q=${encodeURIComponent(query)}` : `${API_BASE}/api/items`
-                    fetch(url).then((r)=>r.json()).then(setItems).catch(()=>{})
-                  }}>Delete</button>
-                </div>
-              )}
-              {isAdmin && editing[it._id] && (
-                <div className="review-section">
-                  <div className="review-form">
-                    <select value={editing[it._id].category} onChange={(e)=>setEditing((p)=>({ ...p, [it._id]: { ...p[it._id], category: e.target.value } }))}>
-                      <option value="raw">raw</option>
-                      <option value="processed">processed</option>
-                    </select>
-                    <input className="review-input" placeholder="Name" value={editing[it._id].name} onChange={(e)=>setEditing((p)=>({ ...p, [it._id]: { ...p[it._id], name: e.target.value } }))} />
-                    <input className="review-input" placeholder="Price" value={editing[it._id].price} onChange={(e)=>setEditing((p)=>({ ...p, [it._id]: { ...p[it._id], price: e.target.value } }))} />
-                  </div>
-                  <div className="review-form">
-                    <input className="review-input" placeholder="Image URL" value={editing[it._id].imagePath} onChange={(e)=>setEditing((p)=>({ ...p, [it._id]: { ...p[it._id], imagePath: e.target.value } }))} />
-                  </div>
-                  <div className="review-form">
-                    <input className="review-input" type="number" min={0} placeholder="grams" value={editing[it._id].grams} onChange={(e)=>setEditing((p)=>({ ...p, [it._id]: { ...p[it._id], grams: Number(e.target.value) } }))} />
-                    <input className="review-input" type="number" min={0} placeholder="pieces" value={editing[it._id].pieces} onChange={(e)=>setEditing((p)=>({ ...p, [it._id]: { ...p[it._id], pieces: Number(e.target.value) } }))} />
-                    <input className="review-input" type="number" min={0} placeholder="serves" value={editing[it._id].serves} onChange={(e)=>setEditing((p)=>({ ...p, [it._id]: { ...p[it._id], serves: Number(e.target.value) } }))} />
-                  </div>
-                  <div className="review-form">
-                    <textarea className="review-input" rows={3} placeholder="Description" value={editing[it._id].description} onChange={(e)=>setEditing((p)=>({ ...p, [it._id]: { ...p[it._id], description: e.target.value } }))} />
-                  </div>
-                  <div className="actions">
-                    <button className="auth-btn" onClick={async()=>{
-                      const t = localStorage.getItem('token')
-                      if (!t) return navigate('/login')
-                      const body = editing[it._id]
-                      const res = await fetch(`${API_BASE}/api/admin/items/${it._id}`, {
-                        method:'PUT',
-                        headers: { 'Content-Type':'application/json', Authorization: `Bearer ${t}` },
-                        body: JSON.stringify(body)
-                      })
-                      if (res.status === 401) { localStorage.removeItem('token'); return navigate('/login') }
-                      const data = await res.json()
-                      if (!res.ok) return alert(data.error || 'Update failed')
-                      setEditing((p)=>({ ...p, [it._id]: null }))
-                      const url = query ? `${API_BASE}/api/items?q=${encodeURIComponent(query)}` : `${API_BASE}/api/items`
-                      fetch(url).then((r)=>r.json()).then(setItems).catch(()=>{})
-                    }}>Save</button>
-                    <button className="btn-modern" onClick={()=>setEditing((p)=>({ ...p, [it._id]: null }))}>Cancel</button>
-                  </div>
-                </div>
-              )}
-              <div className="actions">
-                <input
-                      type="number"
-                      value={qty[it._id] ?? 1}
-                      onChange={(e) => {
-                        const val = e.target.value
-                        if (val === '') {
-                          setQty((prev) => ({ ...prev, [it._id]: '' }))
-                          return
-                        }
-                        const v = Number(val)
-                        setQty((prev) => ({ ...prev, [it._id]: isNaN(v) ? 1 : Math.max(0, v) }))
-                      }}
-                      className="aj-qty"
-                    />
-                <button className="aj-cta" onClick={() => addToCart(it._id)}>Add to cart</button>
-              </div>
-              <div className="review-toggle" onClick={()=>toggleReviews(it)}>
-                <span>Reviews</span>
-                <span className="rating-badge">⭐ {Number(it.ratingAvg||0).toFixed(1)} ({it.ratingCount||0})</span>
-                <span className="chev">{expanded[it._id] ? '▴' : '▾'}</span>
-              </div>
-              {expanded[it._id] && (
-                <div className="review-section">
-                  {(!reviews[it._id] || reviews[it._id].reviews.length === 0) && <p>No reviews yet</p>}
-                  {reviews[it._id] && reviews[it._id].reviews.map((r) => (
-                    <div className="review-item">
-                      <div className="review-head">⭐ {r.rating} — {r.username}</div>
-                      {r.comment && <div className="review-text">{r.comment}</div>}
-                      <div className="review-date">{new Date(r.createdAt).toLocaleString()}</div>
-                      {isAdmin && (
-                        <button
-                          className="btn-modern"
-                          onClick={async ()=>{
-                            const t = localStorage.getItem('token')
-                            if (!t) return navigate('/login')
-                            const del = await fetch(`${API_BASE}/api/admin/reviews/${r._id}`, { method: 'DELETE', headers: { Authorization: `Bearer ${t}` } })
-                            if (del.status === 401) { localStorage.removeItem('token'); return navigate('/login') }
-                            if (!del.ok) { const dd = await del.json(); return alert(dd.error || 'Delete failed') }
-                            const r2 = await fetch(`${API_BASE}/api/items/${it._id}/reviews`)
-                            const d2 = await r2.json()
-                            setReviews((p)=>({ ...p, [it._id]: d2 }))
-                            const url = query ? `${API_BASE}/api/items?q=${encodeURIComponent(query)}` : `${API_BASE}/api/items`
-                            fetch(url).then((r)=>r.json()).then(setItems).catch(()=>{})
-                          }}
-                        >
-                          Delete
-                        </button>
-                      )}
-                    </div>
-                  ))}
-                  <div className="review-form">
-                    <select
-                      value={(reviewInputs[it._id]?.rating) ?? 5}
-                      onChange={(e)=>setReviewInputs((p)=>({ ...p, [it._id]: { ...(p[it._id]||{ rating:5, comment:'' }), rating: Number(e.target.value) } }))}
-                    >
-                      {[1,2,3,4,5].map(n=> <option key={n} value={n}>{n}</option>)}
-                    </select>
-                    <input
-                      className="review-input"
-                      placeholder="Share your experience"
-                      value={(reviewInputs[it._id]?.comment) ?? ''}
-                      onChange={(e)=>setReviewInputs((p)=>({ ...p, [it._id]: { ...(p[it._id]||{ rating:5, comment:'' }), comment: e.target.value } }))}
-                    />
-                    <button className="btn-modern" onClick={()=>submitReviewInline(it._id)}>Submit</button>
-                  </div>
-                </div>
-              )}
-            </div>
+            <ItemCard 
+              key={it._id} 
+              it={it} 
+              wishlistIds={wishlistIds} 
+              toggleWishlist={toggleWishlist} 
+              addToCart={addToCart} 
+              qty={qty} 
+              setQty={setQty} 
+              isAdmin={isAdmin} 
+              editing={editing} 
+              setEditing={setEditing} 
+              updateStatus={updateStatus} 
+              expanded={expanded} 
+              toggleReviews={toggleReviews} 
+              reviews={reviews} 
+              reviewInputs={reviewInputs} 
+              setReviewInputs={setReviewInputs} 
+              submitReviewInline={submitReviewInline}
+              deleteReview={deleteReview}
+              navigate={navigate}
+              query={query}
+              setItems={setItems}
+            />
           ))}
         </div>
       )}
