@@ -137,7 +137,7 @@ li { margin-bottom: 12px; font-size: 1.1rem; }
 .spec-grid { display:grid; grid-template-columns: repeat(3, 1fr); gap:8px; margin-top:8px; }
 .spec-field { display:flex; flex-direction: column; gap:6px; }
 .spec-label { font-size:12px; color:#555; }
-.chart { background:#fff; border:1px solid #eee; border-radius:12px; padding:12px; margin-bottom:12px; }
+.chart { background:#5e5959; border:1px solid #807d7d; border-radius:12px; padding:12px; margin-bottom:12px; }
 .chart-bars { display:flex; align-items:flex-end; gap:8px; height:160px; overflow-x:auto; padding-bottom:6px; }
 .chart-bar { display:flex; flex-direction:column; align-items:center; gap:4px; width:40px; }
 .chart-bar-fill { width:100%; border-radius:8px 8px 0 0; }
