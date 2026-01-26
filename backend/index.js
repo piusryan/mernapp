@@ -215,7 +215,7 @@ async function importItemsFromImages() {
       if (f.includes('frozen') || f.includes('marinated')) return 249;
       return 299;
     } else {
-      if (f.includes('salami') || f.includes('sausage')) return 199;
+      if (f.includes('chicken_salami')) return 199;
       if (f.includes('pickle')) return 149;
       if (f.includes('spice')) return 149;
       return 199;
