@@ -219,7 +219,7 @@ export default function Items() {
                step="50"
                value={maxPrice}
                onChange={e => setMaxPrice(Number(e.target.value))}
-               style={{ width: 150, cursor: 'pointer' }}
+               className="metallic-range"
              />
           </div>
       </div>
