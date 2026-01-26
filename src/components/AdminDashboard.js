@@ -11,6 +11,7 @@ export default function AdminDashboard() {
   const mapObjRef = useRef(null)
   const markersRef = useRef(null)
   const highlightRef = useRef(null)
+  const [activeCarts, setActiveCarts] = useState([])
   const [trackCode, setTrackCode] = useState('')
   const [trackError, setTrackError] = useState('')
   const [emailQuery, setEmailQuery] = useState('')
@@ -37,9 +38,20 @@ export default function AdminDashboard() {
         if (res.ok) setLocations(data)
       } catch {}
     }
+    async function loadCarts() {
+      try {
+        const res = await fetch(`${API_BASE}/api/admin/carts`, { headers: { Authorization: `Bearer ${t}` } })
+        const data = await res.json()
+        if (res.ok) setActiveCarts(data)
+      } catch {}
+    }
     load()
     loadLocs()
-    const timer = setInterval(loadLocs, 3000)
+    loadCarts()
+    const timer = setInterval(() => {
+      loadLocs()
+      loadCarts()
+    }, 3000)
     return () => clearInterval(timer)
   }, [navigate])
   useEffect(() => {
