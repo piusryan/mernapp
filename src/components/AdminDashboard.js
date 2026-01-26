@@ -177,6 +177,7 @@ export default function AdminDashboard() {
       </div>
 
       <h3 style={{ marginTop: 16 }}>Live Shopping Monitor (Active Carts)</h3>
+      {/* Live Cart Spy Section - Re-verified */}
       <div className="item-card" style={{ padding: 16 }}>
         {activeCarts.length === 0 && <div style={{ color: '#555' }}>No active shoppers right now.</div>}
         {activeCarts.map(c => (

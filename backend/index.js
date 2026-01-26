@@ -924,6 +924,7 @@ app.post('/api/admin/items', authMiddleware, async (req, res) => {
   }
 })
 
+// Live Cart Spy Endpoint - Re-verified
 app.get('/api/admin/carts', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     // Find carts that have items
