@@ -8,6 +8,7 @@ const path = require('path');
 const { sendOtpEmail, sendOrderEmail } = require('./mailer');
 const Stripe = require('stripe');
 const multer = require('multer');
+const cloudinary = require('cloudinary').v2;
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -785,8 +786,25 @@ app.post('/api/admin/upload', authMiddleware, upload.single('image'), async (req
     
     const filename = 'upload-' + Date.now() + path.extname(req.file.originalname);
     
-    // GitHub Upload Strategy (Permanent)
-    if (process.env.GITHUB_TOKEN) {
+    // Cloudinary Upload Strategy (Fastest & Best)
+    if (process.env.CLOUDINARY_URL) {
+      // Stream upload to Cloudinary
+      const result = await new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          { folder: 'mernapp_uploads' },
+          (error, result) => {
+            if (error) reject(error);
+            else resolve(result);
+          }
+        );
+        stream.end(req.file.buffer);
+      });
+      
+      // Return the secure URL from Cloudinary
+      res.json({ path: result.secure_url, method: 'cloudinary' });
+    }
+    // GitHub Upload Strategy (Permanent but Slow)
+    else if (process.env.GITHUB_TOKEN) {
       // Clean the token (remove quotes/spaces if user added them)
       const rawToken = process.env.GITHUB_TOKEN.trim();
       const token = rawToken.replace(/^["']|["']$/g, '');
