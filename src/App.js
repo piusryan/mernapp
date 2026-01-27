@@ -61,16 +61,17 @@ function App() {
     }
   }, [token]);
   React.useEffect(() => {
-    let timer = null
     async function updateLocation() {
       try {
         if (!token) return
         if (localStorage.getItem('cookiesAccepted') !== 'true') return
+        
         const meRes = await fetch(`${process.env.REACT_APP_API_BASE || 'http://localhost:5000'}/api/auth/me`, { headers: { Authorization: `Bearer ${token}` } })
         const me = await meRes.json()
         if (!meRes.ok) return
         if (me && me.role === 'admin') return
         if (!('geolocation' in navigator)) return
+        
         let best = null
         let watchId = null
         await new Promise((resolve) => {
@@ -98,19 +99,32 @@ function App() {
         }
 
         if (best) {
+          // Automatic Reverse Geocoding
+          let address = ''
+          try {
+            const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${best.lat}&lon=${best.lon}&zoom=18&addressdetails=1`)
+            const j = await res.json()
+            address = (j && (j.display_name || (j.address && Object.values(j.address).join(', ')))) || ''
+          } catch {}
+
           await fetch(`${process.env.REACT_APP_API_BASE || 'http://localhost:5000'}/api/user/location`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-            body: JSON.stringify({ lat: best.lat, lon: best.lon, accuracy: best.accuracy, source: 'GPS' })
+            body: JSON.stringify({ 
+              lat: best.lat, 
+              lon: best.lon, 
+              accuracy: best.accuracy, 
+              source: 'GPS',
+              landmark: address // Send address to be saved in MongoDB
+            })
           })
         }
       } catch {}
     }
-    if (token && localStorage.getItem('cookiesAccepted') === 'true') {
-      updateLocation()
-      timer = setInterval(updateLocation, 30000)
-    }
-    return () => { if (timer) clearInterval(timer) }
+
+    updateLocation()
+    const interval = setInterval(updateLocation, 50000) // 50 seconds interval
+    return () => clearInterval(interval)
   }, [token])
   return (
     <BrowserRouter>
