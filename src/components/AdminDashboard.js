@@ -115,6 +115,7 @@ export default function AdminDashboard() {
         
         const last = u.updatedAt ? new Date(u.updatedAt).toLocaleString() : ''
         const acc = u.acc != null ? `±${Math.round(u.acc)}m` : ''
+        const src = u.src ? `[${u.src}] ` : ''
         const prefer = u.address || u.landmark
         
         let cartHtml = ''
@@ -125,7 +126,7 @@ export default function AdminDashboard() {
         const txt = `<strong>${u.username}</strong>
           ${prefer ? `<div style="color:#555">${prefer}</div>` : ''}
           ${cartHtml}
-          ${acc ? `<div style="color:#777; font-size:11px">Accuracy: ${acc}</div>` : ''}
+          ${acc ? `<div style="color:#777; font-size:11px">${src}Accuracy: ${acc}</div>` : ''}
           ${last ? `<div style="color:#777; font-size:11px">Last seen: ${last}</div>` : ''}`
           
         mk.bindPopup(txt)

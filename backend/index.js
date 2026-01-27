@@ -77,6 +77,7 @@ const userSchema = new mongoose.Schema(
       type: { type: String, enum: ['Point'], default: 'Point' },
       coordinates: { type: [Number] }
     },
+    locationSource: { type: String, enum: ['GPS', 'IP'], default: 'IP' },
     address: { type: String, default: '' },
   },
   { timestamps: true }
@@ -1183,12 +1184,14 @@ app.get('/api/admin/stats', authMiddleware, async (req, res) => {
 // User location & cookies consent
 app.post('/api/user/location', authMiddleware, async (req, res) => {
   try {
-    const { lat, lon, accuracy, landmark, cookiesAccepted } = req.body || {};
+    const { lat, lon, accuracy, landmark, cookiesAccepted, source } = req.body || {};
     const user = await User.findById(req.userId);
     if (!user) return res.status(404).json({ error: 'User not found' });
     let latUse = lat != null ? Number(lat) : null
     let lonUse = lon != null ? Number(lon) : null
     let accUse = accuracy != null ? Math.max(0, Number(accuracy)) : null
+    let sourceUse = source || 'GPS'
+    
     if (latUse == null || lonUse == null) {
       try {
         let ip = ''
@@ -1201,12 +1204,14 @@ app.post('/api/user/location', authMiddleware, async (req, res) => {
         latUse = j && j.latitude != null ? Number(j.latitude) : latUse
         lonUse = j && j.longitude != null ? Number(j.longitude) : lonUse
         accUse = accUse != null ? accUse : 1000
+        sourceUse = 'IP'
       } catch {}
     }
     if (latUse != null && lonUse != null) {
       user.location = { lat: latUse, lon: lonUse };
       if (accUse != null) user.locationAcc = accUse
       user.locationPoint = { type: 'Point', coordinates: [lonUse, latUse] }
+      user.locationSource = sourceUse
       async function geocode(latv, lonv) {
         try {
           const provider = String(process.env.GEO_PROVIDER || '').toLowerCase()
@@ -1251,7 +1256,7 @@ app.get('/api/admin/users/locations', authMiddleware, async (req, res) => {
     
     // Get users with location data
     const users = await User.find({ cookiesAccepted: true, role: 'customer' })
-      .select('username location locationAcc landmark address updatedAt')
+      .select('username location locationAcc locationSource landmark address updatedAt')
       .sort({ updatedAt: -1 });
 
     // Get active carts to link with users
@@ -1270,6 +1275,7 @@ app.get('/api/admin/users/locations', authMiddleware, async (req, res) => {
         lat: u.location && u.location.lat != null ? u.location.lat : null,
         lon: u.location && u.location.lon != null ? u.location.lon : null,
         acc: u.locationAcc != null ? u.locationAcc : null,
+        src: u.locationSource || 'IP',
         landmark: u.landmark || '',
         address: u.address || '',
         updatedAt: u.updatedAt,

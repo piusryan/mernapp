@@ -79,20 +79,29 @@ function App() {
             const a = pos.coords.accuracy || 9999
             if (!best || a < best.accuracy) {
               best = { lat: pos.coords.latitude, lon: pos.coords.longitude, accuracy: a }
-              if (a <= 30) {
+              if (a <= 50) {
                 done = true
                 resolve(null)
               }
             }
-          }, () => {}, { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 })
-          setTimeout(() => { if (!done) resolve(null) }, 6000)
+          }, () => {}, { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 })
+          setTimeout(() => { if (!done) resolve(null) }, 10000)
         })
         try { if (watchId != null) navigator.geolocation.clearWatch(watchId) } catch {}
+        
+        // Fallback to single shot if watch timed out without result
+        if (!best) {
+          try {
+            const pos = await new Promise((res, rej) => navigator.geolocation.getCurrentPosition(res, rej, { enableHighAccuracy: false, timeout: 5000 }))
+            best = { lat: pos.coords.latitude, lon: pos.coords.longitude, accuracy: pos.coords.accuracy }
+          } catch {}
+        }
+
         if (best) {
           await fetch(`${process.env.REACT_APP_API_BASE || 'http://localhost:5000'}/api/user/location`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-            body: JSON.stringify({ lat: best.lat, lon: best.lon, accuracy: best.accuracy })
+            body: JSON.stringify({ lat: best.lat, lon: best.lon, accuracy: best.accuracy, source: 'GPS' })
           })
         }
       } catch {}
