@@ -2,6 +2,8 @@ import React, { useEffect, useState, useRef } from 'react'
 import '../home.css'
 import { useNavigate } from 'react-router-dom'
 import { API_BASE } from '../api'
+import maplibregl from 'maplibre-gl'
+import 'maplibre-gl/dist/maplibre-gl.css'
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState({ usersCount: 0, ordersCount: 0, revenueTotal: 0, bestSelling: [], timeseries: [], category: { raw:0, processed:0 } })
@@ -9,14 +11,54 @@ export default function AdminDashboard() {
   const [locations, setLocations] = useState([])
   const mapRef = useRef(null)
   const mapObjRef = useRef(null)
-  const markersRef = useRef(null)
-  const highlightRef = useRef(null)
+  const markersRef = useRef({}) // Store markers by ID
   const [activeCarts, setActiveCarts] = useState([])
   const [trackCode, setTrackCode] = useState('')
   const [trackError, setTrackError] = useState('')
   const [emailQuery, setEmailQuery] = useState('')
   const [emailError, setEmailError] = useState('')
   const navigate = useNavigate()
+  
+  // Style for simple OSM Raster in MapLibre
+  const mapStyle = {
+    version: 8,
+    sources: {
+      'osm': {
+        type: 'raster',
+        tiles: ['https://a.tile.openstreetmap.org/{z}/{x}/{y}.png'],
+        tileSize: 256,
+        attribution: '&copy; OpenStreetMap Contributors',
+        maxzoom: 19
+      },
+      'satellite': {
+        type: 'raster',
+        tiles: [
+          'https://tiles.maps.eox.at/wmts?layer=s2cloudless-2020_3857&style=default&tilematrixset=GoogleMapsCompatible&Service=WMTS&request=GetTile&version=1.0.0&Format=image/jpeg&TileMatrix={z}&TileCol={x}&TileRow={y}'
+        ],
+        tileSize: 256,
+        attribution: 'Imagery © Sentinel-2, EOX IT Services',
+        maxzoom: 19
+      }
+    },
+    layers: [
+      {
+        id: 'osm-layer',
+        type: 'raster',
+        source: 'osm',
+        minzoom: 0,
+        maxzoom: 19
+      },
+      {
+        id: 'satellite-layer',
+        type: 'raster',
+        source: 'satellite',
+        minzoom: 0,
+        maxzoom: 19,
+        layout: { visibility: 'none' }
+      }
+    ]
+  }
+
   useEffect(() => {
     const t = localStorage.getItem('token')
     if (!t) return navigate('/login')
@@ -54,65 +96,73 @@ export default function AdminDashboard() {
     }, 3000)
     return () => clearInterval(timer)
   }, [navigate])
+
   useEffect(() => {
-    async function ensureLeaflet() {
-      if (window.L) return
-      const link = document.createElement('link')
-      link.rel = 'stylesheet'
-      link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css'
-      document.head.appendChild(link)
-      await new Promise((resolve) => {
-        const s = document.createElement('script')
-        s.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'
-        s.onload = resolve
-        document.body.appendChild(s)
-      })
-    }
-    async function initMap() {
-      await ensureLeaflet()
+    function initMap() {
       if (!mapRef.current || mapObjRef.current) return
-      // Default center (Mumbai)
-      const center = [19.0760, 72.8777]
-      const m = window.L.map(mapRef.current, { minZoom: 2 }).setView(center, 11)
       
-      // Removed maxBounds to allow global panning
-      // const bounds = window.L.latLngBounds([18.86, 72.65], [19.25, 73.10])
-      // m.setMaxBounds(bounds)
+      const m = new maplibregl.Map({
+        container: mapRef.current,
+        style: mapStyle,
+        center: [72.8777, 19.0760], // Mumbai
+        zoom: 11
+      })
+
+      m.addControl(new maplibregl.NavigationControl(), 'top-right')
       
-      const street = window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap contributors' })
-      const satellite = window.L.tileLayer(
-        'https://tiles.maps.eox.at/wmts?layer=s2cloudless-2020_3857&style=default&tilematrixset=GoogleMapsCompatible&Service=WMTS&request=GetTile&version=1.0.0&Format=image/jpeg&TileMatrix={z}&TileCol={x}&TileRow={y}',
-        { attribution: 'Imagery © Sentinel-2, EOX IT Services', maxZoom: 19 }
-      )
-      satellite.on('tileerror', () => { try { street.addTo(m) } catch {} })
-      street.addTo(m)
-      window.L.control.layers({ Street: street, Satellite: satellite }, {}).addTo(m)
+      // Layer Switcher Logic (Simple button for now)
+      class LayerControl {
+        onAdd(map) {
+          this._map = map;
+          this._container = document.createElement('div');
+          this._container.className = 'maplibregl-ctrl maplibregl-ctrl-group';
+          this._btn = document.createElement('button');
+          this._btn.textContent = '🛰️';
+          this._btn.title = 'Toggle Satellite';
+          this._btn.style.fontSize = '18px';
+          this._btn.onclick = () => {
+            const vis = map.getLayoutProperty('satellite-layer', 'visibility');
+            if (vis === 'visible') {
+              map.setLayoutProperty('satellite-layer', 'visibility', 'none');
+              this._btn.textContent = '🛰️';
+            } else {
+              map.setLayoutProperty('satellite-layer', 'visibility', 'visible');
+              this._btn.textContent = '🗺️';
+            }
+          };
+          this._container.appendChild(this._btn);
+          return this._container;
+        }
+        onRemove() {
+          this._container.parentNode.removeChild(this._container);
+          this._map = undefined;
+        }
+      }
+      m.addControl(new LayerControl(), 'top-right');
+
       mapObjRef.current = m
-      markersRef.current = window.L.layerGroup().addTo(m)
     }
+
     function updateMarkers() {
-      if (!mapObjRef.current || !window.L) return
-      markersRef.current.clearLayers()
+      if (!mapObjRef.current) return
+      const m = mapObjRef.current
       const pts = locations.filter(u => u.lat != null && u.lon != null)
       const now = Date.now()
       const recentMs = 15 * 60 * 1000
+      
+      // Track existing markers to remove stale ones
+      const currentIds = new Set()
+
       for (const u of pts) {
+        currentIds.add(u._id)
         const updatedAt = u.updatedAt ? new Date(u.updatedAt).getTime() : 0
         const isRecent = updatedAt && (now - updatedAt) <= recentMs
         const hasCart = u.cartCount > 0
         
-        let color = '#888' // Offline/Old
-        if (hasCart) color = '#f04' // Active Shopper (Red Hot)
-        else if (isRecent) color = '#0a7' // Online (Green)
+        let color = '#888'
+        if (hasCart) color = '#f04'
+        else if (isRecent) color = '#0a7'
 
-        const mk = window.L.circleMarker([u.lat, u.lon], {
-          radius: hasCart ? 10 : 8,
-          color: color,
-          fillColor: color,
-          fillOpacity: 0.9,
-          weight: 2
-        })
-        
         const last = u.updatedAt ? new Date(u.updatedAt).toLocaleString() : ''
         const acc = u.acc != null ? `±${Math.round(u.acc)}m` : ''
         const src = u.src ? `[${u.src}] ` : ''
@@ -128,19 +178,61 @@ export default function AdminDashboard() {
           ${cartHtml}
           ${acc ? `<div style="color:#777; font-size:11px">${src}Accuracy: ${acc}</div>` : ''}
           ${last ? `<div style="color:#777; font-size:11px">Last seen: ${last}</div>` : ''}`
+
+        // Check if marker exists
+        if (markersRef.current[u._id]) {
+          // Update existing marker
+          const marker = markersRef.current[u._id]
+          marker.setLngLat([u.lon, u.lat])
           
-        mk.bindPopup(txt)
-        markersRef.current.addLayer(mk)
+          // Update popup content
+          const popup = marker.getPopup()
+          if (popup) popup.setHTML(txt)
+          
+          // Update color (re-create element if needed, but simple CSS change is faster)
+          const el = marker.getElement()
+          const circle = el.querySelector('div')
+          if (circle) {
+             circle.style.backgroundColor = color
+             circle.style.width = hasCart ? '20px' : '16px'
+             circle.style.height = hasCart ? '20px' : '16px'
+          }
+        } else {
+          // Create new marker
+          const el = document.createElement('div')
+          el.className = 'map-marker'
+          const circle = document.createElement('div')
+          circle.style.width = hasCart ? '20px' : '16px'
+          circle.style.height = hasCart ? '20px' : '16px'
+          circle.style.backgroundColor = color
+          circle.style.borderRadius = '50%'
+          circle.style.border = '2px solid white'
+          circle.style.boxShadow = '0 2px 4px rgba(0,0,0,0.3)'
+          el.appendChild(circle)
+
+          const marker = new maplibregl.Marker({ element: el })
+            .setLngLat([u.lon, u.lat])
+            .setPopup(new maplibregl.Popup({ offset: 25 }).setHTML(txt))
+            .addTo(m)
+          
+          markersRef.current[u._id] = marker
+        }
       }
-      if (pts.length) {
-        const group = window.L.featureGroup(pts.map(u => window.L.marker([u.lat, u.lon])))
-        try { mapObjRef.current.fitBounds(group.getBounds().pad(0.20)) } catch {}
-      } else {
-        try { mapObjRef.current.setView([19.0760, 72.8777], 12) } catch {}
-      }
+
+      // Remove old markers
+      Object.keys(markersRef.current).forEach(id => {
+        if (!currentIds.has(id)) {
+          markersRef.current[id].remove()
+          delete markersRef.current[id]
+        }
+      })
     }
-    initMap().then(updateMarkers)
+    
+    initMap()
+    updateMarkers()
+
   }, [locations])
+
   const reverseGeocode = async (lat, lon) => {
     try {
       const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lon)}&zoom=18&addressdetails=1`)
@@ -171,15 +263,41 @@ export default function AdminDashboard() {
               if (!res.ok) return setEmailError(data.error || 'Lookup failed')
               const loc = data.userLocation
               const lm = data.userLandmark
-              if (loc && loc.lat != null && loc.lon != null && window.L && mapObjRef.current) {
+              if (loc && loc.lat != null && loc.lon != null && mapObjRef.current) {
                 if (highlightRef.current) { try { highlightRef.current.remove() } catch {} highlightRef.current = null }
-                const mk = window.L.circleMarker([loc.lat, loc.lon], { radius: 10, color:'#f04', fillColor:'#f36', fillOpacity:0.9, weight:3 })
+                
+                // Create highlight marker
+                const el = document.createElement('div')
+                el.className = 'highlight-marker'
+                el.style.width = '20px'
+                el.style.height = '20px'
+                el.style.backgroundColor = '#f04'
+                el.style.borderRadius = '50%'
+                el.style.border = '3px solid white'
+                el.style.boxShadow = '0 0 10px #f04'
+                
+                const mk = new maplibregl.Marker({ element: el })
+                  .setLngLat([loc.lon, loc.lat])
+                
                 const acc = loc.acc != null ? `±${Math.round(loc.acc)}m` : ''
                 const addr = await reverseGeocode(loc.lat, loc.lon)
-                mk.bindPopup(`<strong>${data.username}</strong>${addr ? `<div style='color:#555'>${addr}</div>` : (lm ? `<div style='color:#555'>${lm}</div>` : '')}${acc ? `<div style='color:#777'>${acc}</div>` : ''}`)
+                
+                mk.setPopup(new maplibregl.Popup({ offset: 25 }).setHTML(
+                  `<strong>${data.username}</strong>
+                   ${addr ? `<div style='color:#555'>${addr}</div>` : (lm ? `<div style='color:#555'>${lm}</div>` : '')}
+                   ${acc ? `<div style='color:#777'>${acc}</div>` : ''}`
+                ))
+                
                 mk.addTo(mapObjRef.current)
                 highlightRef.current = mk
-                try { mapObjRef.current.setView([loc.lat, loc.lon], 16) } catch {}
+                
+                try { 
+                  mapObjRef.current.flyTo({
+                    center: [loc.lon, loc.lat],
+                    zoom: 16,
+                    essential: true
+                  })
+                } catch {}
               } else {
                 setEmailError('Location not available for this user')
               }
@@ -243,15 +361,41 @@ export default function AdminDashboard() {
               const loc = data.userLocation
               const lm = data.userLandmark
               const svAddr = data.userAddress
-              if (loc && loc.lat != null && loc.lon != null && window.L && mapObjRef.current) {
+              if (loc && loc.lat != null && loc.lon != null && mapObjRef.current) {
                 if (highlightRef.current) { try { highlightRef.current.remove() } catch {} highlightRef.current = null }
-                const mk = window.L.circleMarker([loc.lat, loc.lon], { radius: 10, color:'#f04', fillColor:'#f36', fillOpacity:0.9, weight:3 })
+                
+                // Create highlight marker
+                const el = document.createElement('div')
+                el.className = 'highlight-marker'
+                el.style.width = '20px'
+                el.style.height = '20px'
+                el.style.backgroundColor = '#f04'
+                el.style.borderRadius = '50%'
+                el.style.border = '3px solid white'
+                el.style.boxShadow = '0 0 10px #f04'
+
+                const mk = new maplibregl.Marker({ element: el })
+                  .setLngLat([loc.lon, loc.lat])
+
                 const acc = loc.acc != null ? `±${Math.round(loc.acc)}m` : ''
                 const addr = svAddr || (await reverseGeocode(loc.lat, loc.lon))
-                mk.bindPopup(`<strong>${data.username}</strong>${addr ? `<div style='color:#555'>${addr}</div>` : (lm ? `<div style='color:#555'>${lm}</div>` : '')}${acc ? `<div style='color:#777'>${acc}</div>` : ''}`)
+                
+                mk.setPopup(new maplibregl.Popup({ offset: 25 }).setHTML(
+                  `<strong>${data.username}</strong>
+                   ${addr ? `<div style='color:#555'>${addr}</div>` : (lm ? `<div style='color:#555'>${lm}</div>` : '')}
+                   ${acc ? `<div style='color:#777'>${acc}</div>` : ''}`
+                ))
+
                 mk.addTo(mapObjRef.current)
                 highlightRef.current = mk
-                try { mapObjRef.current.setView([loc.lat, loc.lon], 16) } catch {}
+                
+                try { 
+                  mapObjRef.current.flyTo({
+                    center: [loc.lon, loc.lat],
+                    zoom: 16,
+                    essential: true
+                  })
+                } catch {}
               } else {
                 setTrackError('Location not available for this order')
               }
