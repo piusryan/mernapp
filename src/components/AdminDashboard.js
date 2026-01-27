@@ -20,46 +20,6 @@ export default function AdminDashboard() {
   const [emailError, setEmailError] = useState('')
   const navigate = useNavigate()
   
-  // Style for simple OSM Raster in MapLibre
-  const mapStyle = {
-    version: 8,
-    sources: {
-      'osm': {
-        type: 'raster',
-        tiles: ['https://a.tile.openstreetmap.org/{z}/{x}/{y}.png'],
-        tileSize: 256,
-        attribution: '&copy; OpenStreetMap Contributors',
-        maxzoom: 19
-      },
-      'satellite': {
-        type: 'raster',
-        tiles: [
-          'https://tiles.maps.eox.at/wmts?layer=s2cloudless-2020_3857&style=default&tilematrixset=GoogleMapsCompatible&Service=WMTS&request=GetTile&version=1.0.0&Format=image/jpeg&TileMatrix={z}&TileCol={x}&TileRow={y}'
-        ],
-        tileSize: 256,
-        attribution: 'Imagery © Sentinel-2, EOX IT Services',
-        maxzoom: 19
-      }
-    },
-    layers: [
-      {
-        id: 'osm-layer',
-        type: 'raster',
-        source: 'osm',
-        minzoom: 0,
-        maxzoom: 19
-      },
-      {
-        id: 'satellite-layer',
-        type: 'raster',
-        source: 'satellite',
-        minzoom: 0,
-        maxzoom: 19,
-        layout: { visibility: 'none' }
-      }
-    ]
-  }
-
   useEffect(() => {
     const t = localStorage.getItem('token')
     if (!t) return navigate('/login')
