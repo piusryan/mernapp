@@ -137,6 +137,61 @@ export default function AdminDashboard() {
       }
       m.addControl(new LayerControl(), 'top-right');
 
+      m.on('load', () => {
+        // Add GeoJSON source for heatmap
+        m.addSource('user-locations', {
+          type: 'geojson',
+          data: { type: 'FeatureCollection', features: [] }
+        })
+
+        // Add Heatmap Layer
+        m.addLayer({
+          id: 'user-heatmap',
+          type: 'heatmap',
+          source: 'user-locations',
+          maxzoom: 15,
+          paint: {
+            // Increase the heatmap weight based on frequency and property magnitude
+            'heatmap-weight': [
+              'interpolate', ['linear'], ['get', 'mag'],
+              0, 0,
+              6, 1
+            ],
+            // Increase the heatmap color weight weight by zoom level
+            // heatmap-intensity is a multiplier on top of heatmap-weight
+            'heatmap-intensity': [
+              'interpolate', ['linear'], ['zoom'],
+              0, 1,
+              15, 3
+            ],
+            // Color ramp for heatmap.  Domain is 0 (low) to 1 (high).
+            // Begin color ramp at 0-stop with a 0-transparency color
+            // to create a blur-like effect.
+            'heatmap-color': [
+              'interpolate', ['linear'], ['heatmap-density'],
+              0, 'rgba(33,102,172,0)',
+              0.2, 'rgb(103,169,207)',
+              0.4, 'rgb(209,229,240)',
+              0.6, 'rgb(253,219,199)',
+              0.8, 'rgb(239,138,98)',
+              1, 'rgb(178,24,43)'
+            ],
+            // Adjust the heatmap radius by zoom level
+            'heatmap-radius': [
+              'interpolate', ['linear'], ['zoom'],
+              0, 2,
+              9, 20
+            ],
+            // Transition from heatmap to circle layer by zoom level
+            'heatmap-opacity': [
+              'interpolate', ['linear'], ['zoom'],
+              14, 1,
+              15, 0
+            ]
+          }
+        })
+      })
+
       mapObjRef.current = m
     }
 
@@ -144,6 +199,20 @@ export default function AdminDashboard() {
       if (!mapObjRef.current) return
       const m = mapObjRef.current
       const pts = locations.filter(u => u.lat != null && u.lon != null)
+      
+      // Update Heatmap Data
+      if (m.getSource('user-locations')) {
+        const geojson = {
+          type: 'FeatureCollection',
+          features: pts.map(u => ({
+            type: 'Feature',
+            properties: { mag: u.cartCount > 0 ? 1 : 0.5 }, // Weight: Active carts = 1, others = 0.5
+            geometry: { type: 'Point', coordinates: [u.lon, u.lat] }
+          }))
+        }
+        m.getSource('user-locations').setData(geojson)
+      }
+
       const now = Date.now()
       const recentMs = 15 * 60 * 1000
       
@@ -329,8 +398,23 @@ export default function AdminDashboard() {
             <div style={{ fontSize: 13, color: '#444', marginTop: 4 }}>
               {c.items.map(i => `${i.name} (x${i.quantity})`).join(', ')}
             </div>
-            <div style={{ textAlign: 'right', fontWeight: 700, fontSize: 14 }}>
-              Potential: ₹{c.items.reduce((s, i) => s + (i.price * i.quantity), 0)}
+            <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
+              <div style={{ fontWeight: 700, fontSize: 14 }}>
+                Potential: ₹{c.items.reduce((s, i) => s + (i.price * i.quantity), 0)}
+              </div>
+              {locations.find(l => l._id === c.userId?._id) && (
+                <button 
+                  onClick={() => {
+                    const loc = locations.find(l => l._id === c.userId?._id)
+                    if (loc && loc.lat && loc.lon && mapObjRef.current) {
+                      mapObjRef.current.flyTo({ center: [loc.lon, loc.lat], zoom: 16, essential: true })
+                    }
+                  }}
+                  style={{ fontSize: 11, padding: '2px 8px', cursor: 'pointer', background: '#0a7', color: 'white', border: 'none', borderRadius: 4 }}
+                >
+                  📍 Locate
+                </button>
+              )}
             </div>
           </div>
         ))}
