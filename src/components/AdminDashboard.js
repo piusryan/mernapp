@@ -5,6 +5,42 @@ import { API_BASE } from '../api'
 import maplibregl from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
 
+const mapStyle = {
+  version: 8,
+  sources: {
+    osm: {
+      type: 'raster',
+      tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
+      tileSize: 256,
+      attribution: '&copy; OpenStreetMap Contributors',
+      maxzoom: 19
+    },
+    satellite: {
+      type: 'raster',
+      tiles: [
+        'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
+      ],
+      tileSize: 256,
+      attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+    }
+  },
+  layers: [
+    {
+      id: 'osm',
+      type: 'raster',
+      source: 'osm'
+    },
+    {
+      id: 'satellite-layer',
+      type: 'raster',
+      source: 'satellite',
+      layout: {
+        visibility: 'none'
+      }
+    }
+  ]
+}
+
 export default function AdminDashboard() {
   const [stats, setStats] = useState({ usersCount: 0, ordersCount: 0, revenueTotal: 0, bestSelling: [], timeseries: [], category: { raw:0, processed:0 } })
   const [error, setError] = useState('')
