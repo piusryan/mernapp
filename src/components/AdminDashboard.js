@@ -71,9 +71,9 @@ export default function AdminDashboard() {
     async function initMap() {
       await ensureLeaflet()
       if (!mapRef.current || mapObjRef.current) return
-      // Default center (Mumbai), but zoom unlocked
+      // Default center (Mumbai)
       const center = [19.0760, 72.8777]
-      const m = window.L.map(mapRef.current, { minZoom: 2 }).setView(center, 5)
+      const m = window.L.map(mapRef.current, { minZoom: 2 }).setView(center, 11)
       
       // Removed maxBounds to allow global panning
       // const bounds = window.L.latLngBounds([18.86, 72.65], [19.25, 73.10])
