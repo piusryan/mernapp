@@ -95,17 +95,35 @@ export default function AdminDashboard() {
       for (const u of pts) {
         const updatedAt = u.updatedAt ? new Date(u.updatedAt).getTime() : 0
         const isRecent = updatedAt && (now - updatedAt) <= recentMs
+        const hasCart = u.cartCount > 0
+        
+        let color = '#888' // Offline/Old
+        if (hasCart) color = '#f04' // Active Shopper (Red Hot)
+        else if (isRecent) color = '#0a7' // Online (Green)
+
         const mk = window.L.circleMarker([u.lat, u.lon], {
-          radius: 8,
-          color: isRecent ? '#0a7' : '#888',
-          fillColor: isRecent ? '#0a7' : '#888',
+          radius: hasCart ? 10 : 8,
+          color: color,
+          fillColor: color,
           fillOpacity: 0.9,
           weight: 2
         })
+        
         const last = u.updatedAt ? new Date(u.updatedAt).toLocaleString() : ''
         const acc = u.acc != null ? `±${Math.round(u.acc)}m` : ''
         const prefer = u.address || u.landmark
-        const txt = `<strong>${u.username}</strong>${prefer ? `<div style="color:#555">${prefer}</div>` : ''}${acc ? `<div style="color:#777">${acc}</div>` : ''}${last ? `<div style="color:#777">${last}</div>` : ''}`
+        
+        let cartHtml = ''
+        if (hasCart) {
+          cartHtml = `<div style="margin-top:4px; font-weight:bold; color:#f04">🛒 ${u.cartCount} items (₹${u.cartTotal})</div>`
+        }
+
+        const txt = `<strong>${u.username}</strong>
+          ${prefer ? `<div style="color:#555">${prefer}</div>` : ''}
+          ${cartHtml}
+          ${acc ? `<div style="color:#777; font-size:11px">Accuracy: ${acc}</div>` : ''}
+          ${last ? `<div style="color:#777; font-size:11px">Last seen: ${last}</div>` : ''}`
+          
         mk.bindPopup(txt)
         markersRef.current.addLayer(mk)
       }
@@ -201,8 +219,9 @@ export default function AdminDashboard() {
       <div className="item-card" style={{ padding: 12, marginTop: 8 }}>
         <div style={{ display:'flex', alignItems:'center', gap:8 }}>
           <span style={{ fontWeight:600 }}>Legend:</span>
-          <span className="status-badge" style={{ background:'#cfeee0', color:'#0a7' }}>Recent (≤15 min)</span>
-          <span className="status-badge" style={{ background:'#eee', color:'#555' }}>Older</span>
+          <span className="status-badge" style={{ background:'#ffe0e0', color:'#f04' }}>🛒 Active Cart</span>
+          <span className="status-badge" style={{ background:'#cfeee0', color:'#0a7' }}>Online</span>
+          <span className="status-badge" style={{ background:'#eee', color:'#555' }}>Offline</span>
         </div>
       </div>
       <h3 style={{ marginTop: 16 }}>User Locations</h3>

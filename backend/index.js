@@ -1248,17 +1248,37 @@ app.get('/api/admin/users/locations', authMiddleware, async (req, res) => {
   try {
     const me = await User.findById(req.userId);
     if (!me || me.role !== 'admin' || me.username !== 'AJadmin') return res.status(403).json({ error: 'Admin only' });
-    const users = await User.find({ cookiesAccepted: true, role: 'customer' }).select('username location locationAcc landmark address updatedAt').sort({ updatedAt: -1 });
-    res.json(users.map(u => ({
-      username: u.username,
-      lat: u.location && u.location.lat != null ? u.location.lat : null,
-      lon: u.location && u.location.lon != null ? u.location.lon : null,
-      acc: u.locationAcc != null ? u.locationAcc : null,
-      landmark: u.landmark || '',
-      address: u.address || '',
-      updatedAt: u.updatedAt
-    })));
+    
+    // Get users with location data
+    const users = await User.find({ cookiesAccepted: true, role: 'customer' })
+      .select('username location locationAcc landmark address updatedAt')
+      .sort({ updatedAt: -1 });
+
+    // Get active carts to link with users
+    const activeCarts = await Cart.find({ 'items.0': { $exists: true } }).select('userId items');
+    const cartMap = new Map();
+    activeCarts.forEach(c => {
+      const total = c.items.reduce((sum, i) => sum + (i.price * i.quantity), 0);
+      cartMap.set(String(c.userId), { count: c.items.length, total });
+    });
+
+    res.json(users.map(u => {
+      const cart = cartMap.get(String(u._id));
+      return {
+        _id: u._id,
+        username: u.username,
+        lat: u.location && u.location.lat != null ? u.location.lat : null,
+        lon: u.location && u.location.lon != null ? u.location.lon : null,
+        acc: u.locationAcc != null ? u.locationAcc : null,
+        landmark: u.landmark || '',
+        address: u.address || '',
+        updatedAt: u.updatedAt,
+        cartCount: cart ? cart.count : 0,
+        cartTotal: cart ? cart.total : 0
+      };
+    }));
   } catch (e) {
+    console.error(e);
     res.status(500).json({ error: 'Fetch user locations failed' })
   }
 });
