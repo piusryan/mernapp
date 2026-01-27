@@ -12,6 +12,7 @@ export default function AdminDashboard() {
   const mapRef = useRef(null)
   const mapObjRef = useRef(null)
   const markersRef = useRef({}) // Store markers by ID
+  const highlightRef = useRef(null)
   const [activeCarts, setActiveCarts] = useState([])
   const [trackCode, setTrackCode] = useState('')
   const [trackError, setTrackError] = useState('')
