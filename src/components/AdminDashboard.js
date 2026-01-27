@@ -71,10 +71,14 @@ export default function AdminDashboard() {
     async function initMap() {
       await ensureLeaflet()
       if (!mapRef.current || mapObjRef.current) return
+      // Default center (Mumbai), but zoom unlocked
       const center = [19.0760, 72.8777]
-      const m = window.L.map(mapRef.current, { minZoom: 9 }).setView(center, 12)
-      const bounds = window.L.latLngBounds([18.86, 72.65], [19.25, 73.10])
-      m.setMaxBounds(bounds)
+      const m = window.L.map(mapRef.current, { minZoom: 2 }).setView(center, 5)
+      
+      // Removed maxBounds to allow global panning
+      // const bounds = window.L.latLngBounds([18.86, 72.65], [19.25, 73.10])
+      // m.setMaxBounds(bounds)
+      
       const street = window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap contributors' })
       const satellite = window.L.tileLayer(
         'https://tiles.maps.eox.at/wmts?layer=s2cloudless-2020_3857&style=default&tilematrixset=GoogleMapsCompatible&Service=WMTS&request=GetTile&version=1.0.0&Format=image/jpeg&TileMatrix={z}&TileCol={x}&TileRow={y}',
