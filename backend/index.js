@@ -20,13 +20,17 @@ const hpp = require('hpp');
 
 const app = express();
 
-const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN || 'http://localhost:3000';
+const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN || 'http://localhost:3000,https://ajmeats.dpdns.org';
 app.use(cors({
   origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
     const allowed = FRONTEND_ORIGIN.split(',').map(o => o.trim());
-    if (!origin || allowed.includes(origin)) {
+    if (allowed.includes(origin) || allowed.includes('*')) {
       callback(null, true);
     } else {
+      console.log('Blocked by CORS:', origin);
       callback(new Error('Not allowed by CORS'));
     }
   },
@@ -1351,4 +1355,13 @@ if (fs.existsSync(buildDir)) {
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
+});
+
+// Global Error Handler (Must be last)
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(err.status || 500).json({
+    error: err.message || 'Internal Server Error',
+    status: err.status || 500
+  });
 });
