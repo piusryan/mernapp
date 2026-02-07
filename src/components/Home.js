@@ -36,9 +36,7 @@ export default function Home() {
             setSlides([
               '/offerimages/country_eggs.jpg',
               '/offerimages/frozen_marinated_chicken.jpg',
-              '/offerimages/broiler_chicken.jpg',
-              '/offerimages/ironprawns.webp',
-              '/offerimages/pomfret.jpg'
+              '/offerimages/broiler_chicken.jpg'
             ])
           }
         } else {
@@ -46,9 +44,7 @@ export default function Home() {
            setSlides([
             '/offerimages/country_eggs.jpg',
             '/offerimages/frozen_marinated_chicken.jpg',
-            '/offerimages/broiler_chicken.jpg',
-            '/offerimages/ironprawns.webp',
-            '/offerimages/pomfret.jpg'
+            '/offerimages/broiler_chicken.jpg'
           ])
         }
       } catch {
@@ -56,9 +52,7 @@ export default function Home() {
         setSlides([
           '/offerimages/country_eggs.jpg',
           '/offerimages/frozen_marinated_chicken.jpg',
-          '/offerimages/broiler_chicken.jpg',
-          '/offerimages/ironprawns.webp',
-          '/offerimages/pomfret.jpg'
+          '/offerimages/broiler_chicken.jpg'
         ])
         setPicks([]) 
       }
