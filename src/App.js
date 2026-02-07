@@ -85,15 +85,15 @@ function App() {
                 resolve(null)
               }
             }
-          }, () => {}, { enableHighAccuracy: true, timeout: 60000, maximumAge: 0 })
-          setTimeout(() => { if (!done) resolve(null) }, 45000)
+          }, () => {}, { enableHighAccuracy: true, timeout: 90000, maximumAge: 0 })
+          setTimeout(() => { if (!done) resolve(null) }, 60000)
         })
         try { if (watchId != null) navigator.geolocation.clearWatch(watchId) } catch {}
         
         // Fallback to single shot if watch timed out without result
         if (!best) {
           try {
-            const pos = await new Promise((res, rej) => navigator.geolocation.getCurrentPosition(res, rej, { enableHighAccuracy: false, timeout: 15000 }))
+            const pos = await new Promise((res, rej) => navigator.geolocation.getCurrentPosition(res, rej, { enableHighAccuracy: false, timeout: 20000 }))
             best = { lat: pos.coords.latitude, lon: pos.coords.longitude, accuracy: pos.coords.accuracy }
           } catch {}
         }
@@ -123,7 +123,7 @@ function App() {
     }
 
     updateLocation()
-    const interval = setInterval(updateLocation, 80000) // 80 seconds interval
+    const interval = setInterval(updateLocation, 120000) // 120 seconds interval
     return () => clearInterval(interval)
   }, [token])
   return (
