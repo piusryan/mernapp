@@ -20,6 +20,19 @@ const hpp = require('hpp');
 
 const app = express();
 
+const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN || 'http://localhost:3000';
+app.use(cors({
+  origin: (origin, callback) => {
+    const allowed = FRONTEND_ORIGIN.split(',').map(o => o.trim());
+    if (!origin || allowed.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: false
+}));
+
 // Security Middleware Configuration
 app.use(helmet({
   crossOriginResourcePolicy: { policy: "cross-origin" }
@@ -36,18 +49,6 @@ app.use('/api', limiter); // Apply to API routes
 const port = process.env.PORT || 5000;
 const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-change-me';
 
-const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN || 'http://localhost:3000';
-app.use(cors({
-  origin: (origin, callback) => {
-    const allowed = FRONTEND_ORIGIN.split(',').map(o => o.trim());
-    if (!origin || allowed.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  credentials: false
-}));
 app.use(express.json());
 
 // Data Sanitization against NoSQL query injection
