@@ -20,13 +20,16 @@ const hpp = require('hpp');
 
 const app = express();
 
-const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN || 'http://localhost:3000,https://ajmeats.dpdns.org';
+const envOrigin = process.env.FRONTEND_ORIGIN || '';
+const defaultOrigins = 'http://localhost:3000,https://ajmeats.dpdns.org';
+const allOrigins = `${envOrigin},${defaultOrigins}`;
+
 app.use(cors({
   origin: (origin, callback) => {
     // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
     
-    const allowed = FRONTEND_ORIGIN.split(',').map(o => o.trim());
+    const allowed = allOrigins.split(',').map(o => o.trim()).filter(Boolean);
     if (allowed.includes(origin) || allowed.includes('*')) {
       callback(null, true);
     } else {
