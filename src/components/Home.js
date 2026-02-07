@@ -32,15 +32,35 @@ export default function Home() {
           if (pics && pics.length) {
             setSlides(pics.slice(0, 12))
           } else {
-            const imgs = arr.map((it) => it.imagePath).filter(Boolean)
-            setSlides(imgs.slice(0, 12))
+            // Fallback to known offer images if API returns empty
+            setSlides([
+              '/offerimages/country_eggs.jpg',
+              '/offerimages/frozen_marinated_chicken.jpg',
+              '/offerimages/broiler_chicken.jpg',
+              '/offerimages/ironprawns.webp',
+              '/offerimages/pomfret.jpg'
+            ])
           }
         } else {
-          const imgs = arr.map((it) => it.imagePath).filter(Boolean)
-          setSlides(imgs.slice(0, 12))
+           // Fallback to known offer images if API fails
+           setSlides([
+            '/offerimages/country_eggs.jpg',
+            '/offerimages/frozen_marinated_chicken.jpg',
+            '/offerimages/broiler_chicken.jpg',
+            '/offerimages/ironprawns.webp',
+            '/offerimages/pomfret.jpg'
+          ])
         }
       } catch {
-        setPicks([]); setSlides([])
+        // Fallback to known offer images on error
+        setSlides([
+          '/offerimages/country_eggs.jpg',
+          '/offerimages/frozen_marinated_chicken.jpg',
+          '/offerimages/broiler_chicken.jpg',
+          '/offerimages/ironprawns.webp',
+          '/offerimages/pomfret.jpg'
+        ])
+        setPicks([]) 
       }
     }
     load()
