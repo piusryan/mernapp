@@ -59,7 +59,13 @@ const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-change-me';
 app.use(express.json());
 
 // Data Sanitization against NoSQL query injection
-app.use(mongoSanitize());
+// Custom middleware for Express 5 compatibility (req.query is read-only)
+app.use((req, res, next) => {
+  if (req.body) mongoSanitize.sanitize(req.body);
+  if (req.params) mongoSanitize.sanitize(req.params);
+  if (req.query) mongoSanitize.sanitize(req.query);
+  next();
+});
 
 // Data Sanitization against XSS
 app.use(xss());
