@@ -33,15 +33,6 @@ const limiter = rateLimit({
 });
 app.use('/api', limiter); // Apply to API routes
 
-// Data Sanitization against NoSQL query injection
-app.use(mongoSanitize());
-
-// Data Sanitization against XSS
-app.use(xss());
-
-// Prevent Parameter Pollution
-app.use(hpp());
-
 const port = process.env.PORT || 5000;
 const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-change-me';
 
@@ -58,6 +49,15 @@ app.use(cors({
   credentials: false
 }));
 app.use(express.json());
+
+// Data Sanitization against NoSQL query injection
+app.use(mongoSanitize());
+
+// Data Sanitization against XSS
+app.use(xss());
+
+// Prevent Parameter Pollution
+app.use(hpp());
 
 // Helper to resolve asset paths (checks current dir first, then parent)
 const getAssetPath = (...segments) => {
