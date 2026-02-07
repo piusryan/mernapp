@@ -310,267 +310,271 @@ export default function AdminDashboard() {
     }
   }
   return (
-    <div className="container">
+    <div className="container" style={{ paddingBottom: 60 }}>
       <h2>Admin Dashboard</h2>
       {error && <p style={{ color: 'red' }}>{error}</p>}
-      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(220px, 1fr))', gap:12 }}>
-        <div className="item-card" style={{ padding: 16 }}>
-          <div style={{ fontSize: 14, color:'#555' }}>Total Users</div>
-          <div style={{ fontSize: 28, fontWeight:700 }}>{stats.usersCount}</div>
+      
+      {/* 1. Top Stats */}
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(200px, 1fr))', gap:16, marginBottom: 24 }}>
+        <div className="item-card" style={{ padding: 20, textAlign:'center' }}>
+          <div style={{ fontSize: 14, color:'#555', textTransform:'uppercase', letterSpacing:1 }}>Total Users</div>
+          <div style={{ fontSize: 32, fontWeight:700, color:'#333' }}>{stats.usersCount}</div>
         </div>
-        <div style={{ display:'flex', gap:8, alignItems:'center', marginBottom:8 }}>
-          <input className="auth-input" placeholder="User email" value={emailQuery} onChange={(e)=>setEmailQuery(e.target.value)} style={{ maxWidth: 280 }} />
-          <button className="auth-btn" onClick={async ()=>{
-            setEmailError('')
-            const t = localStorage.getItem('token')
-            try {
-              const res = await fetch(`${API_BASE}/api/admin/user/location?email=${encodeURIComponent(emailQuery.trim())}`, { headers: { Authorization: `Bearer ${t}` } })
-              const data = await res.json()
-              if (!res.ok) return setEmailError(data.error || 'Lookup failed')
-              const loc = data.userLocation
-              const lm = data.userLandmark
-              if (loc && loc.lat != null && loc.lon != null && mapObjRef.current) {
-                if (highlightRef.current) { try { highlightRef.current.remove() } catch {} highlightRef.current = null }
-                
-                // Create highlight marker
-                const el = document.createElement('div')
-                el.className = 'highlight-marker'
-                el.style.width = '20px'
-                el.style.height = '20px'
-                el.style.backgroundColor = '#f04'
-                el.style.borderRadius = '50%'
-                el.style.border = '3px solid white'
-                el.style.boxShadow = '0 0 10px #f04'
-                
-                const mk = new maplibregl.Marker({ element: el })
-                  .setLngLat([loc.lon, loc.lat])
-                
-                const acc = loc.acc != null ? `±${Math.round(loc.acc)}m` : ''
-                const addr = await reverseGeocode(loc.lat, loc.lon)
-                
-                mk.setPopup(new maplibregl.Popup({ offset: 25 }).setHTML(
-                  `<strong>${data.username}</strong>
-                   ${addr ? `<div style='color:#555'>${addr}</div>` : (lm ? `<div style='color:#555'>${lm}</div>` : '')}
-                   ${acc ? `<div style='color:#777'>${acc}</div>` : ''}`
-                ))
-                
-                mk.addTo(mapObjRef.current)
-                highlightRef.current = mk
-                
-                try { 
-                  mapObjRef.current.flyTo({
-                    center: [loc.lon, loc.lat],
-                    zoom: 16,
-                    essential: true
-                  })
-                } catch {}
-              } else {
-                setEmailError('Location not available for this user')
-              }
-            } catch (e) {
-              setEmailError('Lookup failed')
-            }
-          }}>Locate by Email</button>
-          {emailError && <span style={{ color:'red' }}>{emailError}</span>}
+        <div className="item-card" style={{ padding: 20, textAlign:'center' }}>
+          <div style={{ fontSize: 14, color:'#555', textTransform:'uppercase', letterSpacing:1 }}>Total Orders</div>
+          <div style={{ fontSize: 32, fontWeight:700, color:'#333' }}>{stats.ordersCount}</div>
         </div>
-        <div className="item-card" style={{ padding: 16 }}>
-          <div style={{ fontSize: 14, color:'#555' }}>Total Orders</div>
-          <div style={{ fontSize: 28, fontWeight:700 }}>{stats.ordersCount}</div>
-        </div>
-        <div className="item-card" style={{ padding: 16 }}>
-          <div style={{ fontSize: 14, color:'#555' }}>Revenue</div>
-          <div style={{ fontSize: 28, fontWeight:700 }}>₹{Number(stats.revenueTotal||0).toFixed(0)}</div>
+        <div className="item-card" style={{ padding: 20, textAlign:'center' }}>
+          <div style={{ fontSize: 14, color:'#555', textTransform:'uppercase', letterSpacing:1 }}>Revenue</div>
+          <div style={{ fontSize: 32, fontWeight:700, color:'#0a7' }}>₹{Number(stats.revenueTotal||0).toFixed(0)}</div>
         </div>
       </div>
 
-      <h3 style={{ marginTop: 16 }}>Live Shopping Monitor (Active Carts)</h3>
-      {/* Live Cart Spy Section - Re-verified */}
-      <div className="item-card" style={{ padding: 16 }}>
-        {activeCarts.length === 0 && <div style={{ color: '#555' }}>No active shoppers right now.</div>}
-        {activeCarts.map(c => (
-          <div key={c._id} style={{ borderBottom: '1px solid #eee', paddingBottom: 8, marginBottom: 8 }}>
-            <div style={{ fontWeight: 600, color: '#0a7' }}>
-              {c.userId?.username || 'Unknown User'}
-              <span style={{ fontSize: 12, color: '#888', marginLeft: 8 }}>
-                ({new Date(c.updatedAt).toLocaleTimeString()})
-              </span>
+      {/* 2. Map Section (Prominent) */}
+      <div className="item-card" style={{ padding: 0, marginBottom: 24, overflow: 'hidden', height: 500, position:'relative' }}>
+         <div ref={mapRef} className="admin-map" style={{ width:'100%', height:'100%' }} />
+         <div style={{ position:'absolute', bottom:10, left:10, background:'rgba(255,255,255,0.9)', padding:8, borderRadius:4, fontSize:12, pointerEvents:'none', zIndex: 10 }}>
+            <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+              <span style={{ fontWeight:600 }}>Legend:</span>
+              <span className="status-badge" style={{ background:'#ffe0e0', color:'#f04' }}>🛒 Active Cart</span>
+              <span className="status-badge" style={{ background:'#cfeee0', color:'#0a7' }}>Online</span>
+              <span className="status-badge" style={{ background:'#eee', color:'#555' }}>Offline</span>
             </div>
-            <div style={{ fontSize: 13, color: '#444', marginTop: 4 }}>
-              {c.items.map(i => `${i.name} (x${i.quantity})`).join(', ')}
-            </div>
-            <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
-              <div style={{ fontWeight: 700, fontSize: 14 }}>
-                Potential: ₹{c.items.reduce((s, i) => s + (i.price * i.quantity), 0)}
+         </div>
+      </div>
+
+      {/* 3. Live Monitoring & Tracking Grid */}
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(350px, 1fr))', gap:24, marginBottom: 24 }}>
+        
+        {/* Live Shopping Monitor */}
+        <div>
+          <h3 style={{ marginBottom:12 }}>Live Shopping Monitor</h3>
+          <div className="item-card" style={{ padding: 16, maxHeight: 400, overflowY: 'auto' }}>
+            {activeCarts.length === 0 && <div style={{ color: '#555', padding:20, textAlign:'center' }}>No active shoppers right now.</div>}
+            {activeCarts.map(c => (
+              <div key={c._id} style={{ borderBottom: '1px solid #eee', paddingBottom: 12, marginBottom: 12 }}>
+                <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start' }}>
+                    <div style={{ fontWeight: 600, color: '#0a7' }}>
+                    {c.userId?.username || 'Unknown User'}
+                    <div style={{ fontSize: 11, color: '#888' }}>
+                        Last update: {new Date(c.updatedAt).toLocaleTimeString()}
+                    </div>
+                    </div>
+                    <div style={{ textAlign: 'right' }}>
+                        <div style={{ fontWeight: 700, fontSize: 15 }}>
+                            ₹{c.items.reduce((s, i) => s + (i.price * i.quantity), 0)}
+                        </div>
+                        {locations.find(l => l._id === c.userId?._id) && (
+                            <button 
+                            onClick={() => {
+                                const loc = locations.find(l => l._id === c.userId?._id)
+                                if (loc && loc.lat && loc.lon && mapObjRef.current) {
+                                mapObjRef.current.flyTo({ center: [loc.lon, loc.lat], zoom: 16, essential: true })
+                                }
+                            }}
+                            style={{ fontSize: 11, marginTop:4, padding: '4px 10px', cursor: 'pointer', background: '#0a7', color: 'white', border: 'none', borderRadius: 12 }}
+                            >
+                            📍 Locate
+                            </button>
+                        )}
+                    </div>
+                </div>
+                <div style={{ fontSize: 13, color: '#444', marginTop: 8, background:'#f9f9f9', padding:8, borderRadius:4 }}>
+                  {c.items.map(i => `${i.name} (x${i.quantity})`).join(', ')}
+                </div>
               </div>
-              {locations.find(l => l._id === c.userId?._id) && (
-                <button 
-                  onClick={() => {
-                    const loc = locations.find(l => l._id === c.userId?._id)
-                    if (loc && loc.lat && loc.lon && mapObjRef.current) {
-                      mapObjRef.current.flyTo({ center: [loc.lon, loc.lat], zoom: 16, essential: true })
-                    }
-                  }}
-                  style={{ fontSize: 11, padding: '2px 8px', cursor: 'pointer', background: '#0a7', color: 'white', border: 'none', borderRadius: 4 }}
-                >
-                  📍 Locate
-                </button>
-              )}
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <div className="item-card" style={{ padding: 12, marginTop: 8 }}>
-        <div style={{ display:'flex', alignItems:'center', gap:8 }}>
-          <span style={{ fontWeight:600 }}>Legend:</span>
-          <span className="status-badge" style={{ background:'#ffe0e0', color:'#f04' }}>🛒 Active Cart</span>
-          <span className="status-badge" style={{ background:'#cfeee0', color:'#0a7' }}>Online</span>
-          <span className="status-badge" style={{ background:'#eee', color:'#555' }}>Offline</span>
-        </div>
-      </div>
-      <h3 style={{ marginTop: 16 }}>User Locations</h3>
-      <div className="item-card" style={{ padding: 16 }}>
-        <div style={{ display:'flex', gap:8, alignItems:'center', marginBottom:8 }}>
-          <input className="auth-input" placeholder="Order ID or Tracking" value={trackCode} onChange={(e)=>setTrackCode(e.target.value)} style={{ maxWidth: 280 }} />
-          <button className="auth-btn" onClick={async ()=>{
-            setTrackError('')
-            const t = localStorage.getItem('token')
-            try {
-              const res = await fetch(`${API_BASE}/api/orders/track/${encodeURIComponent(trackCode.trim())}`, { headers: { Authorization: `Bearer ${t}` } })
-              const data = await res.json()
-              if (!res.ok) return setTrackError(data.error || 'Track failed')
-              const loc = data.userLocation
-              const lm = data.userLandmark
-              const svAddr = data.userAddress
-              if (loc && loc.lat != null && loc.lon != null && mapObjRef.current) {
-                if (highlightRef.current) { try { highlightRef.current.remove() } catch {} highlightRef.current = null }
-                
-                // Create highlight marker
-                const el = document.createElement('div')
-                el.className = 'highlight-marker'
-                el.style.width = '20px'
-                el.style.height = '20px'
-                el.style.backgroundColor = '#f04'
-                el.style.borderRadius = '50%'
-                el.style.border = '3px solid white'
-                el.style.boxShadow = '0 0 10px #f04'
-
-                const mk = new maplibregl.Marker({ element: el })
-                  .setLngLat([loc.lon, loc.lat])
-
-                const acc = loc.acc != null ? `±${Math.round(loc.acc)}m` : ''
-                const addr = svAddr || (await reverseGeocode(loc.lat, loc.lon))
-                
-                mk.setPopup(new maplibregl.Popup({ offset: 25 }).setHTML(
-                  `<strong>${data.username}</strong>
-                   ${addr ? `<div style='color:#555'>${addr}</div>` : (lm ? `<div style='color:#555'>${lm}</div>` : '')}
-                   ${acc ? `<div style='color:#777'>${acc}</div>` : ''}`
-                ))
-
-                mk.addTo(mapObjRef.current)
-                highlightRef.current = mk
-                
-                try { 
-                  mapObjRef.current.flyTo({
-                    center: [loc.lon, loc.lat],
-                    zoom: 16,
-                    essential: true
-                  })
-                } catch {}
-              } else {
-                setTrackError('Location not available for this order')
-              }
-            } catch (e) {
-              setTrackError('Track failed')
-            }
-          }}>Locate</button>
-          {trackError && <span style={{ color:'red' }}>{trackError}</span>}
-        </div>
-        {locations.length === 0 && <div style={{ color:'#555' }}>No user locations yet</div>}
-        {locations.length > 0 && (
-          <ul>
-            {locations.map((u, idx)=>(
-              <li key={idx} style={{ marginBottom: 6 }}>
-                <strong>{u.username}</strong>
-                {(u.address || u.landmark) && <span style={{ marginLeft: 8, color:'#555' }}>({u.address || u.landmark})</span>}
-                {(u.lat != null && u.lon != null) && <span style={{ marginLeft: 8, color:'#777' }}>[{u.lat.toFixed(4)}, {u.lon.toFixed(4)}]</span>}
-              </li>
             ))}
-          </ul>
-        )}
-      </div>
-      <div className="item-card" style={{ padding: 0, marginTop: 12 }}>
-        <div ref={mapRef} className="admin-map" />
-      </div>
-      <h3 style={{ marginTop: 16 }}>Orders (last 14 days)</h3>
-      <div className="chart">
-        <div className="chart-bars">
-          {(stats.timeseries||[]).map((d)=> {
-            const max = Math.max(1, ...(stats.timeseries||[]).map(x=>x.orders||0))
-            const h = Math.round((d.orders||0) / max * 120)
-            return (
-              <div key={d.day} className="chart-bar">
-                <div className="chart-bar-fill" style={{ height: h, background:'#3dd9ff' }} />
-                <div className="chart-bar-label">{d.day.slice(5)}</div>
-                <div className="chart-bar-value">{d.orders||0}</div>
-              </div>
-            )
-          })}
-        </div>
-      </div>
-      <h3 style={{ marginTop: 16 }}>Revenue (last 14 days)</h3>
-      <div className="chart">
-        <div className="chart-bars">
-          {(stats.timeseries||[]).map((d)=> {
-            const max = Math.max(1, ...(stats.timeseries||[]).map(x=>x.revenue||0))
-            const h = Math.round((d.revenue||0) / max * 120)
-            return (
-              <div key={d.day+'rev'} className="chart-bar">
-                <div className="chart-bar-fill" style={{ height: h, background:'#7f3dff' }} />
-                <div className="chart-bar-label">{d.day.slice(5)}</div>
-                <div className="chart-bar-value">₹{Number(d.revenue||0).toFixed(0)}</div>
-              </div>
-            )
-          })}
-        </div>
-      </div>
-      <h3 style={{ marginTop: 16 }}>Category Breakdown</h3>
-      <div className="item-card" style={{ padding: 16 }}>
-        <div className="hbar">
-          <div className="hbar-label">Raw</div>
-          <div className="hbar-track">
-            {(() => {
-              const tot = (stats.category?.raw||0) + (stats.category?.processed||0)
-              const pct = tot ? Math.round((stats.category.raw||0) / tot * 100) : 0
-              return <div className="hbar-fill" style={{ width: `${pct}%`, background:'#3dd9ff' }} />
-            })()}
           </div>
-          <div className="hbar-value">{stats.category?.raw||0}</div>
         </div>
-        <div className="hbar">
-          <div className="hbar-label">Processed</div>
-          <div className="hbar-track">
-            {(() => {
-              const tot = (stats.category?.raw||0) + (stats.category?.processed||0)
-              const pct = tot ? Math.round((stats.category.processed||0) / tot * 100) : 0
-              return <div className="hbar-fill" style={{ width: `${pct}%`, background:'#ff9a3d' }} />
-            })()}
+
+        {/* User Lookup Tools */}
+        <div>
+          <h3 style={{ marginBottom:12 }}>Locate User / Order</h3>
+          <div className="item-card" style={{ padding: 20 }}>
+            {/* Email Lookup */}
+            <div style={{ marginBottom: 16 }}>
+                <label style={{ display:'block', fontSize:12, fontWeight:600, color:'#555', marginBottom:4 }}>Locate by Email</label>
+                <div style={{ display:'flex', gap:8 }}>
+                    <input className="auth-input" placeholder="User email" value={emailQuery} onChange={(e)=>setEmailQuery(e.target.value)} style={{ flex:1 }} />
+                    <button className="auth-btn" onClick={async ()=>{
+                        setEmailError('')
+                        const t = localStorage.getItem('token')
+                        try {
+                        const res = await fetch(`${API_BASE}/api/admin/user/location?email=${encodeURIComponent(emailQuery.trim())}`, { headers: { Authorization: `Bearer ${t}` } })
+                        const data = await res.json()
+                        if (!res.ok) return setEmailError(data.error || 'Lookup failed')
+                        const loc = data.userLocation
+                        const lm = data.userLandmark
+                        if (loc && loc.lat != null && loc.lon != null && mapObjRef.current) {
+                            if (highlightRef.current) { try { highlightRef.current.remove() } catch {} highlightRef.current = null }
+                            
+                            const el = document.createElement('div')
+                            el.className = 'highlight-marker'
+                            el.style.width = '20px'
+                            el.style.height = '20px'
+                            el.style.backgroundColor = '#f04'
+                            el.style.borderRadius = '50%'
+                            el.style.border = '3px solid white'
+                            el.style.boxShadow = '0 0 10px #f04'
+                            
+                            const mk = new maplibregl.Marker({ element: el }).setLngLat([loc.lon, loc.lat])
+                            const acc = loc.acc != null ? `±${Math.round(loc.acc)}m` : ''
+                            const addr = await reverseGeocode(loc.lat, loc.lon)
+                            
+                            mk.setPopup(new maplibregl.Popup({ offset: 25 }).setHTML(
+                            `<strong>${data.username}</strong>
+                            ${addr ? `<div style='color:#555'>${addr}</div>` : (lm ? `<div style='color:#555'>${lm}</div>` : '')}
+                            ${acc ? `<div style='color:#777'>${acc}</div>` : ''}`
+                            ))
+                            mk.addTo(mapObjRef.current)
+                            highlightRef.current = mk
+                            try { mapObjRef.current.flyTo({ center: [loc.lon, loc.lat], zoom: 16, essential: true }) } catch {}
+                        } else { setEmailError('Location not available') }
+                        } catch (e) { setEmailError('Lookup failed') }
+                    }}>Find</button>
+                </div>
+                {emailError && <div style={{ color:'red', fontSize:12, marginTop:4 }}>{emailError}</div>}
+            </div>
+
+            {/* Order/Tracking Lookup */}
+            <div>
+                <label style={{ display:'block', fontSize:12, fontWeight:600, color:'#555', marginBottom:4 }}>Locate by Order ID / Tracking</label>
+                <div style={{ display:'flex', gap:8 }}>
+                    <input className="auth-input" placeholder="Order ID or Tracking" value={trackCode} onChange={(e)=>setTrackCode(e.target.value)} style={{ flex:1 }} />
+                    <button className="auth-btn" onClick={async ()=>{
+                        setTrackError('')
+                        const t = localStorage.getItem('token')
+                        try {
+                        const res = await fetch(`${API_BASE}/api/orders/track/${encodeURIComponent(trackCode.trim())}`, { headers: { Authorization: `Bearer ${t}` } })
+                        const data = await res.json()
+                        if (!res.ok) return setTrackError(data.error || 'Track failed')
+                        const loc = data.userLocation
+                        const lm = data.userLandmark
+                        const svAddr = data.userAddress
+                        if (loc && loc.lat != null && loc.lon != null && mapObjRef.current) {
+                            if (highlightRef.current) { try { highlightRef.current.remove() } catch {} highlightRef.current = null }
+                            const el = document.createElement('div')
+                            el.className = 'highlight-marker'
+                            el.style.width = '20px'
+                            el.style.height = '20px'
+                            el.style.backgroundColor = '#f04'
+                            el.style.borderRadius = '50%'
+                            el.style.border = '3px solid white'
+                            el.style.boxShadow = '0 0 10px #f04'
+                            const mk = new maplibregl.Marker({ element: el }).setLngLat([loc.lon, loc.lat])
+                            const acc = loc.acc != null ? `±${Math.round(loc.acc)}m` : ''
+                            const addr = svAddr || (await reverseGeocode(loc.lat, loc.lon))
+                            mk.setPopup(new maplibregl.Popup({ offset: 25 }).setHTML(
+                            `<strong>${data.username}</strong>
+                            ${addr ? `<div style='color:#555'>${addr}</div>` : (lm ? `<div style='color:#555'>${lm}</div>` : '')}
+                            ${acc ? `<div style='color:#777'>${acc}</div>` : ''}`
+                            ))
+                            mk.addTo(mapObjRef.current)
+                            highlightRef.current = mk
+                            try { mapObjRef.current.flyTo({ center: [loc.lon, loc.lat], zoom: 16, essential: true }) } catch {}
+                        } else { setTrackError('Location not available') }
+                        } catch (e) { setTrackError('Track failed') }
+                    }}>Find</button>
+                </div>
+                {trackError && <div style={{ color:'red', fontSize:12, marginTop:4 }}>{trackError}</div>}
+            </div>
+            
+            <div style={{ marginTop: 24 }}>
+                <div style={{ fontSize:14, fontWeight:600, marginBottom:8 }}>All Users with Location</div>
+                <div style={{ maxHeight: 200, overflowY: 'auto' }}>
+                    {locations.length === 0 && <div style={{ color:'#555', fontSize:13 }}>No user locations yet</div>}
+                    {locations.map((u, idx)=>(
+                    <div key={idx} style={{ marginBottom: 8, fontSize:13, borderBottom:'1px solid #f5f5f5', paddingBottom:4 }}>
+                        <strong>{u.username}</strong>
+                        {(u.address || u.landmark) && <div style={{ color:'#555', fontSize:12 }}>{u.address || u.landmark}</div>}
+                        {(u.lat != null && u.lon != null) && <div style={{ color:'#999', fontSize:11 }}>[{u.lat.toFixed(4)}, {u.lon.toFixed(4)}]</div>}
+                    </div>
+                    ))}
+                </div>
+            </div>
+
           </div>
-          <div className="hbar-value">{stats.category?.processed||0}</div>
         </div>
       </div>
-      <h3 style={{ marginTop: 16 }}>Best-selling Products</h3>
-      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(240px, 1fr))', gap:12 }}>
+
+      {/* 4. Charts Section */}
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(400px, 1fr))', gap:24, marginBottom: 24 }}>
+        <div>
+            <h3 style={{ marginBottom:12 }}>Orders Trend (14 days)</h3>
+            <div className="chart" style={{ height: 200 }}>
+                <div className="chart-bars">
+                {(stats.timeseries||[]).map((d)=> {
+                    const max = Math.max(1, ...(stats.timeseries||[]).map(x=>x.orders||0))
+                    const h = Math.round((d.orders||0) / max * 150)
+                    return (
+                    <div key={d.day} className="chart-bar">
+                        <div className="chart-bar-fill" style={{ height: h, background:'#3dd9ff' }} />
+                        <div className="chart-bar-label">{d.day.slice(5)}</div>
+                        <div className="chart-bar-value">{d.orders||0}</div>
+                    </div>
+                    )
+                })}
+                </div>
+            </div>
+        </div>
+        <div>
+            <h3 style={{ marginBottom:12 }}>Revenue Trend (14 days)</h3>
+            <div className="chart" style={{ height: 200 }}>
+                <div className="chart-bars">
+                {(stats.timeseries||[]).map((d)=> {
+                    const max = Math.max(1, ...(stats.timeseries||[]).map(x=>x.revenue||0))
+                    const h = Math.round((d.revenue||0) / max * 150)
+                    return (
+                    <div key={d.day+'rev'} className="chart-bar">
+                        <div className="chart-bar-fill" style={{ height: h, background:'#7f3dff' }} />
+                        <div className="chart-bar-label">{d.day.slice(5)}</div>
+                        <div className="chart-bar-value">₹{Number(d.revenue||0).toFixed(0)}</div>
+                    </div>
+                    )
+                })}
+                </div>
+            </div>
+        </div>
+      </div>
+
+      {/* 5. Best Selling Products */}
+      <h3 style={{ marginTop: 32, marginBottom: 16 }}>Top Products (All Time)</h3>
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(200px, 1fr))', gap:12 }}>
         {(stats.bestSelling||[]).map((p)=>(
           <div className="item-card" key={p.name} style={{ padding: 16 }}>
-            <div style={{ fontWeight:700 }}>{p.name}</div>
-            <div style={{ marginTop:6, display:'flex', justifyContent:'space-between' }}>
+            <div style={{ fontWeight:700, fontSize:15, marginBottom:4 }}>{p.name}</div>
+            <div style={{ display:'flex', justifyContent:'space-between', color:'#555', fontSize:13 }}>
               <span>Qty: {p.qty}</span>
-              <span>₹{Number(p.revenue||0).toFixed(0)}</span>
+              <span style={{ fontWeight:600, color:'#333' }}>₹{Number(p.revenue||0).toFixed(0)}</span>
             </div>
           </div>
         ))}
       </div>
+
+      {/* 6. NEW: Weekly Item Sales */}
+      <h3 style={{ marginTop: 32, marginBottom: 16 }}>Weekly Item Demand (Last 14 Days)</h3>
+      <div style={{ overflowX: 'auto', paddingBottom: 16, whiteSpace: 'nowrap' }}>
+        <div style={{ display: 'inline-flex', gap: 16 }}>
+          {(stats.timeseries||[]).slice().reverse().map((day) => (
+            <div key={day.day} className="item-card" style={{ minWidth: 220, maxWidth: 220, padding: 16, verticalAlign: 'top', whiteSpace: 'normal' }}>
+                <div style={{ fontWeight: 'bold', marginBottom: 12, borderBottom:'1px solid #eee', paddingBottom:8, color:'#333' }}>
+                    {new Date(day.day).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}
+                </div>
+                <div style={{ minHeight: 100 }}>
+                    {day.items && day.items.length > 0 ? (
+                        day.items.map((it, i) => (
+                            <div key={i} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, marginBottom: 6, alignItems:'center' }}>
+                                <span style={{ overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', marginRight:8 }} title={it.name}>{it.name}</span>
+                                <span style={{ fontWeight: 600, background:'#eee', padding:'2px 6px', borderRadius:10, fontSize:11 }}>{it.qty}</span>
+                            </div>
+                        ))
+                    ) : <div style={{ color: '#aaa', fontSize: 13, textAlign:'center', marginTop:20 }}>No items sold</div>}
+                </div>
+            </div>
+          ))}
+        </div>
+      </div>
+      
     </div>
   )
 }

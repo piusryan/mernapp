@@ -1152,7 +1152,7 @@ app.get('/api/admin/stats', authMiddleware, async (req, res) => {
       const d = new Date(today.getFullYear(), today.getMonth(), today.getDate() - i)
       const key = d.toISOString().slice(0,10)
       days.push(key)
-      dayMap.set(key, { day: key, orders: 0, revenue: 0 })
+      dayMap.set(key, { day: key, orders: 0, revenue: 0, items: {} })
     }
     for (const o of orders) {
       revenue += o.totalAmount || 0
@@ -1161,6 +1161,10 @@ app.get('/api/admin/stats', authMiddleware, async (req, res) => {
       if (dm) {
         dm.orders += 1
         dm.revenue += o.totalAmount || 0
+        for (const it of o.items) {
+          const iname = it.name || 'Unknown'
+          dm.items[iname] = (dm.items[iname] || 0) + (it.quantity || 0)
+        }
       }
       for (const it of o.items) {
         const key = it.name || String(it.itemId || '')
@@ -1174,7 +1178,15 @@ app.get('/api/admin/stats', authMiddleware, async (req, res) => {
       }
     }
     const bestSelling = Array.from(map.values()).sort((a,b)=> b.qty - a.qty || b.revenue - a.revenue).slice(0, 8)
-    const timeseries = days.map(d => dayMap.get(d))
+    const timeseries = days.map(d => {
+      const data = dayMap.get(d)
+      // Convert items map to sorted array
+      const sortedItems = Object.entries(data.items)
+        .map(([name, qty]) => ({ name, qty }))
+        .sort((a, b) => b.qty - a.qty)
+        .slice(0, 8) // Top 8 items per day
+      return { ...data, items: sortedItems }
+    })
     res.json({ usersCount, ordersCount, revenueTotal: revenue, bestSelling, timeseries, category: cat })
   } catch (e) {
     res.status(500).json({ error: 'Failed to fetch stats' })
