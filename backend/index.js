@@ -1,4 +1,3 @@
-require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -11,67 +10,23 @@ const Stripe = require('stripe');
 const multer = require('multer');
 const cloudinary = require('cloudinary').v2;
 
-// Security Middleware Imports
-const helmet = require('helmet');
-const rateLimit = require('express-rate-limit');
-const mongoSanitize = require('express-mongo-sanitize');
-const xss = require('xss-clean');
-const hpp = require('hpp');
-
 const app = express();
+const port = process.env.PORT || 5000;
+const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-change-me';
 
-const envOrigin = process.env.FRONTEND_ORIGIN || '';
-const defaultOrigins = 'http://localhost:3000,https://ajmeats.dpdns.org';
-const allOrigins = `${envOrigin},${defaultOrigins}`;
-
+const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN || 'http://localhost:3000';
 app.use(cors({
   origin: (origin, callback) => {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
-    
-    const allowed = allOrigins.split(',').map(o => o.trim()).filter(Boolean);
-    if (allowed.includes(origin) || allowed.includes('*')) {
+    const allowed = FRONTEND_ORIGIN.split(',').map(o => o.trim());
+    if (!origin || allowed.includes(origin)) {
       callback(null, true);
     } else {
-      console.log('Blocked by CORS:', origin);
       callback(new Error('Not allowed by CORS'));
     }
   },
   credentials: false
 }));
-
-// Security Middleware Configuration
-app.use(helmet({
-  crossOriginResourcePolicy: { policy: "cross-origin" }
-})); // Set security headers
-
-// Rate limiting to prevent DoS and Brute Force
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // Limit each IP to 100 requests per windowMs
-  message: 'Too many requests from this IP, please try again later.'
-});
-app.use('/api', limiter); // Apply to API routes
-
-const port = process.env.PORT || 5000;
-const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-change-me';
-
 app.use(express.json());
-
-// Data Sanitization against NoSQL query injection
-// Custom middleware for Express 5 compatibility (req.query is read-only)
-app.use((req, res, next) => {
-  if (req.body) mongoSanitize.sanitize(req.body);
-  if (req.params) mongoSanitize.sanitize(req.params);
-  if (req.query) mongoSanitize.sanitize(req.query);
-  next();
-});
-
-// Data Sanitization against XSS
-app.use(xss());
-
-// Prevent Parameter Pollution
-app.use(hpp());
 
 // Helper to resolve asset paths (checks current dir first, then parent)
 const getAssetPath = (...segments) => {
@@ -1364,13 +1319,4 @@ if (fs.existsSync(buildDir)) {
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
-});
-
-// Global Error Handler (Must be last)
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(err.status || 500).json({
-    error: err.message || 'Internal Server Error',
-    status: err.status || 500
-  });
 });
