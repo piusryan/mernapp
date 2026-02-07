@@ -40,8 +40,8 @@ app.use('/offerimages', express.static(getAssetPath('offerimages')));
 app.get('/site-assets/plain.jpg', (req, res) => {
   res.sendFile(getAssetPath('plain.jpg'))
 });
-app.get('/site-assets/pk1.jpeg', (req, res) => {
-  res.sendFile(getAssetPath('pk1.jpeg'))
+app.get('/site-assets/AJ.png', (req, res) => {
+  res.sendFile(getAssetPath('AJ.png'))
 });
 
 const MONGO_URI = process.env.MONGO_URI;

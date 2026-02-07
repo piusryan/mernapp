@@ -9,7 +9,7 @@ Root --> src
 Root --> gitignore[.gitignore]
 Root --> packagejson[package.json]
 Root --> packagelock[package-lock.json]
-Root --> pk1[pk1.jpeg]
+Root --> ajpng[AJ.png]
 Root --> plain[plain.jpg]
 Root --> readme[README.md]
 Root --> rtorun[rtorun.txt]

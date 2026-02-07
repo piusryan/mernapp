@@ -100,7 +100,7 @@ export default function Navbar() {
       <nav className="top-nav">
         <div className="nav-container">
           <div className="brand">
-            <img src={`${API_BASE}/site-assets/pk1.jpeg`} alt="brand" className="brand-logo" />
+            <img src={`${API_BASE}/site-assets/AJ.png`} alt="brand" className="brand-logo" />
             <span>AJ meat store</span>
           </div>
           <div className="nav-links">
