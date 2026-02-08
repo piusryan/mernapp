@@ -1574,6 +1574,8 @@ li { margin-bottom: 12px; font-size: 1.1rem; }
   flex-wrap: wrap;
   justify-content: center;
   gap: 0;
+  width: fit-content;
+  margin: 0 auto;
 }
 .video-card {
   border-radius: 0;
