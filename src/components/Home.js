@@ -195,6 +195,12 @@ export default function Home() {
               <source src="/videos/iftarspecial.mp4" type="video/mp4" />
             </video>
           </div>
+          <div className="video-card">
+            <img src="/videos/meatposter2.png" alt="Meat Poster 2" />
+          </div>
+          <div className="video-card">
+            <img src="/videos/meatposetr.png" alt="Meat Poster" />
+          </div>
         </div>
       </div>
 
