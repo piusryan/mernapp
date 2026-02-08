@@ -18,7 +18,10 @@ const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN || 'http://localhost:3000';
 app.use(cors({
   origin: (origin, callback) => {
     const allowed = FRONTEND_ORIGIN.split(',').map(o => o.trim());
-    if (!origin || allowed.includes(origin)) {
+    // Allow exact matches or Vercel preview URLs for this project
+    const isAllowed = !origin || allowed.includes(origin) || (origin.endsWith('.vercel.app') && origin.includes('mernapp'));
+    
+    if (isAllowed) {
       callback(null, true);
     } else {
       console.log(`[CORS Blocked] Origin: '${origin}' is not in allowed list: ${JSON.stringify(allowed)}`);
