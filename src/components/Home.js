@@ -186,7 +186,9 @@ export default function Home() {
         <h3>Featured Highlights</h3>
         <div className="video-grid">
           <div className="video-card">
-            <img src="/videos/meatposetr.png" alt="Meat Poster" />
+            <video autoPlay loop muted playsInline className="gif-video">
+              <source src="/videos/cleancut.mp4" type="video/mp4" />
+            </video>
           </div>
           <div className="video-card">
             <video autoPlay loop muted playsInline className="gif-video">
@@ -194,10 +196,12 @@ export default function Home() {
             </video>
           </div>
           <div className="video-card">
-            <img src="/videos/meatposter2.png" alt="Meat Poster 2" />
+            <video autoPlay loop muted playsInline className="gif-video">
+              <source src="/videos/legpiece.mp4" type="video/mp4" />
+            </video>
           </div>
           <div className="video-card">
-            <img src="/videos/meatposetr.png" alt="Meat Poster" />
+            <img src="/videos/meatposter2.png" alt="Meat Poster 2" />
           </div>
         </div>
       </div>
