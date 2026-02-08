@@ -1570,9 +1570,10 @@ li { margin-bottom: 12px; font-size: 1.1rem; }
 }
 .video-grid {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: 32px;
-  align-items: center;
 }
 .video-card {
   border-radius: 24px;
@@ -1582,7 +1583,7 @@ li { margin-bottom: 12px; font-size: 1.1rem; }
   background: #000;
   position: relative;
   width: 100%;
-  max-width: 400px; /* Restrict width to keep it looking like a phone screen */
+  max-width: 320px; /* Slightly reduced width for better side-by-side fit */
   aspect-ratio: 9 / 16;
 }
 .video-card:hover {
