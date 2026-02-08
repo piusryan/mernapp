@@ -1571,11 +1571,16 @@ li { margin-bottom: 12px; font-size: 1.1rem; }
 .video-grid {
   display: flex;
   flex-direction: row;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   justify-content: center;
   gap: 0;
-  width: fit-content;
+  width: 100%;
   margin: 0 auto;
+  overflow-x: auto;
+  scrollbar-width: none; /* Hide scrollbar for cleaner look */
+}
+.video-grid::-webkit-scrollbar {
+  display: none;
 }
 .video-card {
   border-radius: 0;
@@ -1584,8 +1589,10 @@ li { margin-bottom: 12px; font-size: 1.1rem; }
   transition: transform 0.2s ease, z-index 0.2s ease;
   background: #000;
   position: relative;
+  flex: 1 1 auto; /* Allow shrinking/growing */
   width: 100%;
   max-width: 320px;
+  min-width: 200px; /* Prevent becoming too small */
   aspect-ratio: 9 / 16;
 }
 .video-card:first-child {
