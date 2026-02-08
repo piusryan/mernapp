@@ -10,6 +10,7 @@ import AdminDashboard from './AdminDashboard';
 import Track from './Track';
 import Wishlist from './Wishlist';
 import Profile from './Profile';
+import About from './About';
 import '../home.css';
 
 const PageLayout = ({ children }) => (
@@ -31,6 +32,7 @@ export default function AnimatedRoutes() {
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
         <Route path="/" element={<PageLayout><Home /></PageLayout>} />
+        <Route path="/about" element={<PageLayout><About /></PageLayout>} />
         <Route path="/login" element={<PageLayout><Login /></PageLayout>} />
         <Route path="/items" element={<PageLayout><Items /></PageLayout>} />
         <Route path="/cart" element={<PageLayout><Cart /></PageLayout>} />

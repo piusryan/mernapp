@@ -105,6 +105,7 @@ export default function Navbar() {
           </div>
           <div className="nav-links">
             <NavLink to="/" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Home</NavLink>
+            <NavLink to="/about" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>About Us</NavLink>
             <NavLink to="/items" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Items</NavLink>
             <NavLink to="/cart" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Cart</NavLink>
             {token && <NavLink to="/wishlist" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Wishlist</NavLink>}

@@ -1462,3 +1462,101 @@ li { margin-bottom: 12px; font-size: 1.1rem; }
   transition: transform 0.1s;
 }
 
+
+/* About Page Styles */
+.about-page-container {
+  background: linear-gradient(135deg, #ffffff, #f8f9fa);
+  border: 1px solid rgba(0,0,0,0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+}
+
+.about-content-wrapper {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 40px;
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .about-content-wrapper {
+    flex-direction: column-reverse;
+    text-align: center;
+  }
+}
+
+.about-text-section {
+  flex: 1;
+}
+
+.about-title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin-bottom: 20px;
+}
+
+.highlight-pink {
+  color: #ff3d7f;
+}
+
+.highlight-purple {
+  color: #5533ff;
+}
+
+.about-desc {
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: #555;
+  margin-bottom: 16px;
+}
+
+.call-owner-card {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  background: #fff;
+  padding: 10px 20px;
+  border-radius: 999px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  text-decoration: none;
+  color: #222;
+  font-weight: 700;
+  margin-top: 20px;
+  transition: transform 0.2s;
+}
+
+.call-owner-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.12);
+}
+
+.phone-icon-circle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #25d366;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+}
+
+.about-image-section {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.owner-photo {
+  width: 100%;
+  max-width: 360px;
+  border-radius: 24px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+  object-fit: cover;
+  aspect-ratio: 3/4;
+}
+
