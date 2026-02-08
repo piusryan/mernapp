@@ -1574,35 +1574,23 @@ li { margin-bottom: 12px; font-size: 1.1rem; }
   gap: 20px;
 }
 .video-card {
-  background: #fff;
   border-radius: 16px;
   overflow: hidden;
   box-shadow: 0 10px 30px rgba(0,0,0,0.1);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  background: #000;
+  position: relative;
 }
 .video-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 16px 40px rgba(0,0,0,0.15);
 }
-.video-card video {
+.video-card video, .gif-video {
   width: 100%;
-  height: auto;
+  height: 100%;
   display: block;
   max-height: 400px;
   object-fit: cover;
-}
-.video-info {
-  padding: 16px;
-}
-.video-title {
-  font-weight: 700;
-  font-size: 1.1rem;
-  margin-bottom: 6px;
-  color: #333;
-}
-.video-desc {
-  font-size: 0.95rem;
-  color: #666;
-  line-height: 1.4;
+  pointer-events: none;
 }
 
