@@ -105,12 +105,12 @@ export default function Navbar() {
           </div>
           <div className="nav-links">
             <NavLink to="/" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Home</NavLink>
-            <NavLink to="/about" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>About Us</NavLink>
             <NavLink to="/items" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Items</NavLink>
             <NavLink to="/cart" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Cart</NavLink>
             {token && <NavLink to="/wishlist" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Wishlist</NavLink>}
             {isAdmin && <NavLink to="/track" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Track</NavLink>}
             {isAdmin && <NavLink to="/admin" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>Admin</NavLink>}
+            <NavLink to="/about" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>About Us</NavLink>
           </div>
           <form className="nav-search" onSubmit={submitSearch}>
             <input
