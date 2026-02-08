@@ -11,6 +11,7 @@ const multer = require('multer');
 const cloudinary = require('cloudinary').v2;
 
 const app = express();
+app.use(morgan('dev'));
 const port = process.env.PORT || 5000;
 const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-change-me';
 
