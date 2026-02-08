@@ -218,7 +218,7 @@ export default function Cart() {
           </div>
         )}
 
-        <div className="cart-promo-video" style={{ marginTop: '32px', borderRadius: '16px', overflow: 'hidden', boxShadow: '0 10px 30px rgba(0,0,0,0.1)' }}>
+        <div className="cart-promo-video" style={{ marginTop: '32px', borderRadius: '16px', overflow: 'hidden', boxShadow: '0 10px 30px rgba(0,0,0,0.1)', maxWidth: '300px', margin: '32px auto 0' }}>
           <video autoPlay loop muted playsInline style={{ width: '100%', display: 'block', objectFit: 'cover' }}>
             <source src="/videos/iftarspecial.mp4" type="video/mp4" />
           </video>
