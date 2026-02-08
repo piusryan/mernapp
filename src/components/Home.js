@@ -186,9 +186,7 @@ export default function Home() {
         <h3>Featured Highlights</h3>
         <div className="video-grid">
           <div className="video-card">
-            <video autoPlay loop muted playsInline className="gif-video">
-              <source src="/videos/cleancut.mp4" type="video/mp4" />
-            </video>
+            <img src="/videos/meatposetr.png" alt="Meat Poster" />
           </div>
           <div className="video-card">
             <video autoPlay loop muted playsInline className="gif-video">
