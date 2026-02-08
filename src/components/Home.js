@@ -181,6 +181,33 @@ export default function Home() {
           ))}
         </div>
       </div>
+
+      <div className="video-highlights">
+        <h3>Featured Highlights</h3>
+        <div className="video-grid">
+          <div className="video-card">
+            <video controls preload="metadata">
+              <source src="/videos/cleancut.mp4" type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+            <div className="video-info">
+              <div className="video-title">Premium Clean Cut</div>
+              <div className="video-desc">Experience our hygiene-first processing standards. We ensure every cut is fresh, clean, and ready for your kitchen.</div>
+            </div>
+          </div>
+          <div className="video-card">
+            <video controls preload="metadata">
+              <source src="/videos/iftarspecial.mp4" type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+            <div className="video-info">
+              <div className="video-title">Iftar Special</div>
+              <div className="video-desc">Celebrate this Ramadan with our exclusive Iftar cuts and offers. Freshness guaranteed for your feast.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {!localStorage.getItem('token') && <AuthModal onClose={()=>{}} />}
     </div>
   )

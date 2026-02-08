@@ -1560,3 +1560,49 @@ li { margin-bottom: 12px; font-size: 1.1rem; }
   aspect-ratio: 3/4;
 }
 
+.video-highlights {
+  margin-top: 32px;
+}
+.video-highlights h3 {
+  margin-bottom: 16px;
+  font-size: 1.5rem;
+  color: #222;
+}
+.video-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+.video-card {
+  background: #fff;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.video-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.15);
+}
+.video-card video {
+  width: 100%;
+  height: auto;
+  display: block;
+  max-height: 400px;
+  object-fit: cover;
+}
+.video-info {
+  padding: 16px;
+}
+.video-title {
+  font-weight: 700;
+  font-size: 1.1rem;
+  margin-bottom: 6px;
+  color: #333;
+}
+.video-desc {
+  font-size: 0.95rem;
+  color: #666;
+  line-height: 1.4;
+}
+
