@@ -4,6 +4,7 @@ import { BrowserRouter } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import AnimatedRoutes from './components/AnimatedRoutes';
 import CookieConsent from './components/CookieConsent';
+import { API_BASE } from './api';
 
 function App() {
   const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
@@ -11,7 +12,7 @@ function App() {
   const [forceAccept, setForceAccept] = React.useState(false);
   React.useEffect(() => {
     if (token) {
-      fetch(`${process.env.REACT_APP_API_BASE || 'http://localhost:5000'}/api/auth/me`, { headers: { Authorization: `Bearer ${token}` } })
+      fetch(`${API_BASE}/api/auth/me`, { headers: { Authorization: `Bearer ${token}` } })
         .then(r => r.json())
         .then(d => {
           if (d && d.role === 'admin') {
@@ -24,7 +25,7 @@ function App() {
           } else {
             const acceptedLocal = localStorage.getItem('cookiesAccepted') === 'true';
             if (acceptedLocal) {
-              fetch(`${process.env.REACT_APP_API_BASE || 'http://localhost:5000'}/api/user/location`, {
+              fetch(`${API_BASE}/api/user/location`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
                 body: JSON.stringify({ cookiesAccepted: true })
@@ -66,7 +67,7 @@ function App() {
         if (!token) return
         if (localStorage.getItem('cookiesAccepted') !== 'true') return
         
-        const meRes = await fetch(`${process.env.REACT_APP_API_BASE || 'http://localhost:5000'}/api/auth/me`, { headers: { Authorization: `Bearer ${token}` } })
+        const meRes = await fetch(`${API_BASE}/api/auth/me`, { headers: { Authorization: `Bearer ${token}` } })
         const me = await meRes.json()
         if (!meRes.ok) return
         if (me && me.role === 'admin') return
@@ -107,7 +108,7 @@ function App() {
             address = (j && (j.display_name || (j.address && Object.values(j.address).join(', ')))) || ''
           } catch {}
 
-          await fetch(`${process.env.REACT_APP_API_BASE || 'http://localhost:5000'}/api/user/location`, {
+          await fetch(`${API_BASE}/api/user/location`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
             body: JSON.stringify({ 
