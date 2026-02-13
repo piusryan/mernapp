@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "https://mernapp-production-3fbc.up.railway.app/api/$1"
+    }
+  ]
+}
