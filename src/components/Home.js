@@ -138,7 +138,7 @@ export default function Home() {
                   heroSlides.map((src, i) => (
                     <div key={i} className={`aj-hero-chip aj-hero-chip-${i + 1}`}>
                       <img 
-                        src={`${API_BASE}${src}`} 
+                        src={src.startsWith('http') ? src : (src.startsWith('/api') ? `${API_BASE.replace('/api', '')}${src}` : `${API_BASE}${src}`)} 
                         alt={`hero-${i}`} 
                         onError={(e) => {
                           e.target.onerror = null;
