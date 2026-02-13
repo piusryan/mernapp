@@ -28,7 +28,7 @@ app.use((req, res, next) => {
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
     "img-src 'self' data: https: http: blob:",
     "font-src 'self' https://fonts.gstatic.com data:",
-    "connect-src 'self' https://api.stripe.com https://*.stripe.com",
+    "connect-src 'self' https: http: https://api.stripe.com https://*.stripe.com",
     "frame-src 'self' https://js.stripe.com https://hooks.stripe.com",
     "object-src 'none'",
     "base-uri 'self'",
