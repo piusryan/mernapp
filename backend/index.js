@@ -13,7 +13,10 @@ const multer = require('multer');
 const cloudinary = require('cloudinary').v2;
 
 const app = express();
-app.use(helmet());
+app.use(helmet({
+  contentSecurityPolicy: false,
+  crossOriginResourcePolicy: { policy: "cross-origin" }
+}));
 app.disable('x-powered-by');
 app.use(morgan('dev'));
 const port = process.env.PORT || 5000;
