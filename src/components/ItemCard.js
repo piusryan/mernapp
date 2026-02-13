@@ -42,7 +42,14 @@ export default function ItemCard({
       
       <div className="card-img-wrapper">
         {srcFor(it) ? (
-          <img src={srcFor(it)} alt={it.name} />
+          <img 
+            src={srcFor(it)} 
+            alt={it.name} 
+            onError={(e) => {
+              e.target.onerror = null;
+              e.target.src = `${API_BASE}/site-assets/plain.jpg`;
+            }}
+          />
         ) : <div className="placeholder-img" />}
       </div>
 

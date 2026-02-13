@@ -137,7 +137,14 @@ export default function Home() {
                 {heroSlides.length ? (
                   heroSlides.map((src, i) => (
                     <div key={i} className={`aj-hero-chip aj-hero-chip-${i + 1}`}>
-                      <img src={`${API_BASE}${src}`} alt={`hero-${i}`} />
+                      <img 
+                        src={`${API_BASE}${src}`} 
+                        alt={`hero-${i}`} 
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.src = `${API_BASE}/site-assets/plain.jpg`;
+                        }}
+                      />
                     </div>
                   ))
                 ) : (
@@ -157,7 +164,15 @@ export default function Home() {
           {picks.map((it) => (
             <div key={it._id} className="item-card top-card">
               {it.imagePath && (
-                <img src={`${API_BASE}${it.imagePath}`} alt={it.name} style={{ width: '100%', height: 160, objectFit: 'cover' }} />
+                <img 
+                  src={`${API_BASE}${it.imagePath}`} 
+                  alt={it.name} 
+                  style={{ width: '100%', height: 160, objectFit: 'cover' }} 
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = `${API_BASE}/site-assets/plain.jpg`;
+                  }}
+                />
               )}
               <div className="content">
                 <div style={{ fontWeight: 600 }}>{it.name}</div>

@@ -26,7 +26,16 @@ export default function AuthModal({ onClose }) {
         <div>
           <div className="promo-grid">
             {images.map((src, i) => (
-              <img key={i} className="promo-img" src={`${API_BASE}${src}`} alt={`promo-${i}`} />
+              <img 
+                key={i} 
+                className="promo-img" 
+                src={`${API_BASE}${src}`} 
+                alt={`promo-${i}`} 
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = `${API_BASE}/site-assets/plain.jpg`;
+                }}
+              />
             ))}
           </div>
         </div>
