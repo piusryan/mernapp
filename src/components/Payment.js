@@ -118,12 +118,17 @@ export default function Payment() {
   return (
     <div className="container" style={{ padding: '40px 20px', maxWidth: 600, margin: '0 auto' }}>
       <h2 style={{ textAlign: 'center', marginBottom: 30 }}>Complete Payment</h2>
-      {clientSecret && stripeInstance && (
+      {clientSecret && stripeInstance ? (
         <Elements options={options} stripe={stripeInstance}>
           <CheckoutForm />
         </Elements>
+      ) : (
+        <div style={{ textAlign: 'center' }}>
+          <p>Loading payment details...</p>
+          {!clientSecret && <p style={{ fontSize: '0.8em', color: '#666' }}>Initializing transaction...</p>}
+          {!stripeInstance && <p style={{ fontSize: '0.8em', color: '#666' }}>Loading payment secure module...</p>}
+        </div>
       )}
-      {!clientSecret && <div style={{ textAlign: 'center' }}>Loading payment details...</div>}
     </div>
   );
 }
