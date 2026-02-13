@@ -13,6 +13,18 @@
       "destination": "https://mernapp-production-3fbc.up.railway.app/site-assets/$1"
     },
     {
+      "source": "/images/(.*)",
+      "destination": "https://mernapp-production-3fbc.up.railway.app/images/$1"
+    },
+    {
+      "source": "/offerimages/(.*)",
+      "destination": "https://mernapp-production-3fbc.up.railway.app/offerimages/$1"
+    },
+    {
+      "source": "/site-assets/(.*)",
+      "destination": "https://mernapp-production-3fbc.up.railway.app/site-assets/$1"
+    },
+    {
       "source": "/api/(.*)",
       "destination": "https://mernapp-production-3fbc.up.railway.app/api/$1"
     }
