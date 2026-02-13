@@ -16,7 +16,7 @@ export default function Track() {
     if (!token) return navigate('/login')
     try {
       const payload = JSON.parse(atob(token.split('.')[1]))
-      const isAdmin = payload && payload.role === 'admin' && payload.username === 'AJadmin'
+      const isAdmin = payload && payload.role === 'admin'
       if (!isAdmin) return navigate('/')
     } catch {
       navigate('/')

@@ -25,7 +25,7 @@ export default function Items() {
   if (tokenRaw) {
     try {
       const payload = JSON.parse(atob(tokenRaw.split('.')[1]))
-      isAdmin = payload && payload.role === 'admin' && payload.username === 'AJadmin'
+      isAdmin = payload && payload.role === 'admin'
     } catch {}
   }
   function srcFor(it) {

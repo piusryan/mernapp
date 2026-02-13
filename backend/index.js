@@ -1,4 +1,5 @@
 const express = require('express');
+const helmet = require('helmet');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const morgan = require('morgan');
@@ -377,9 +378,10 @@ app.post('/api/auth/register', async (req, res) => {
 
 app.post('/api/auth/login', async (req, res) => {
   try {
-    const { email, username, password } = req.body;
+    const { email, username, password, isAdmin } = req.body;
     let user = null;
-    if (username) user = await User.findOne({ username });
+    if (isAdmin) user = await User.findOne({ role: 'admin' });
+    else if (username) user = await User.findOne({ username });
     else if (email) user = await User.findOne({ email });
     if (!user) return res.status(401).json({ error: 'Invalid credentials' });
     const ok = await bcrypt.compare(password, user.passwordHash || '');

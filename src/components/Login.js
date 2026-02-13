@@ -30,7 +30,7 @@ export default function Login() {
       let url = `${API_BASE}/api/auth/${mode}`
       let body = {}
       if (mode === 'login') {
-        body = adminMode ? { username: 'AJadmin', password } : { email, password }
+        body = adminMode ? { isAdmin: true, password } : { email, password }
       } else {
         body = { email, password, otp }
       }

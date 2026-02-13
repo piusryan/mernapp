@@ -14,7 +14,7 @@ export default function Navbar() {
   if (token) {
     try {
       const payload = JSON.parse(atob(token.split('.')[1]))
-      isAdmin = payload && payload.role === 'admin' && payload.username === 'AJadmin'
+      isAdmin = payload && payload.role === 'admin'
       username = payload.username || ''
     } catch {}
   }
