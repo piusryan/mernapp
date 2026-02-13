@@ -34,25 +34,25 @@ export default function Home() {
           } else {
             // Fallback to known offer images if API returns empty
             setSlides([
-              '/offerimages/country_eggs.jpg',
-              '/offerimages/frozen_marinated_chicken.jpg',
-              '/offerimages/broiler_chicken.jpg'
+              `${API_BASE}/offerimages/country_eggs.jpg`,
+              `${API_BASE}/offerimages/frozen_marinated_chicken.jpg`,
+              `${API_BASE}/offerimages/broiler_chicken.jpg`
             ])
           }
         } else {
            // Fallback to known offer images if API fails
            setSlides([
-            '/offerimages/country_eggs.jpg',
-            '/offerimages/frozen_marinated_chicken.jpg',
-            '/offerimages/broiler_chicken.jpg'
+            `${API_BASE}/offerimages/country_eggs.jpg`,
+            `${API_BASE}/offerimages/frozen_marinated_chicken.jpg`,
+            `${API_BASE}/offerimages/broiler_chicken.jpg`
           ])
         }
       } catch {
         // Fallback to known offer images on error
         setSlides([
-          '/offerimages/country_eggs.jpg',
-          '/offerimages/frozen_marinated_chicken.jpg',
-          '/offerimages/broiler_chicken.jpg'
+          `${API_BASE}/offerimages/country_eggs.jpg`,
+          `${API_BASE}/offerimages/frozen_marinated_chicken.jpg`,
+          `${API_BASE}/offerimages/broiler_chicken.jpg`
         ])
         setPicks([]) 
       }
