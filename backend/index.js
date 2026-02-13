@@ -13,6 +13,21 @@ const cloudinary = require('cloudinary').v2;
 
 const app = express();
 
+// Middleware to block security scanners and bots
+app.use((req, res, next) => {
+  const ua = req.get('User-Agent') || '';
+  const scanners = [
+    'ZAP', 'owasp', 'zap', 'nmap', 'nikto', 'burp', 'sqlmap', 'dirbuster', 'gobuster', 
+    'scanner', 'bot', 'headless', 'crawl', 'wget'
+  ];
+  
+  if (scanners.some(s => ua.toLowerCase().includes(s))) {
+    console.log(`[Blocked Scanner] UA: ${ua} | Path: ${req.path}`);
+    return res.status(403).send('Forbidden: Access denied for security tools.');
+  }
+  next();
+});
+
 // Manual Security Headers (Replacement for Helmet)
 app.use((req, res, next) => {
   res.setHeader('X-Content-Type-Options', 'nosniff');
@@ -21,15 +36,15 @@ app.use((req, res, next) => {
   res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
   
-  // Content Security Policy (CSP) - Specifically configured to allow Stripe and local/external images
+  // Tightened Content Security Policy (CSP)
   res.setHeader('Content-Security-Policy', [
     "default-src 'self'",
-    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com",
-    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-    "img-src 'self' data: https: http: blob:",
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://challenges.cloudflare.com",
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://challenges.cloudflare.com",
+    "img-src 'self' data: https: http: blob: https://*.stripe.com https://*.cloudinary.com",
     "font-src 'self' https://fonts.gstatic.com data:",
-    "connect-src 'self' https: http: https://api.stripe.com https://*.stripe.com",
-    "frame-src 'self' https://js.stripe.com https://hooks.stripe.com",
+    "connect-src 'self' https://mernapp-production-3fbc.up.railway.app https://api.stripe.com https://*.stripe.com https://*.resend.com",
+    "frame-src 'self' https://js.stripe.com https://hooks.stripe.com https://challenges.cloudflare.com",
     "object-src 'none'",
     "base-uri 'self'",
     "form-action 'self'",
