@@ -12,6 +12,33 @@ const multer = require('multer');
 const cloudinary = require('cloudinary').v2;
 
 const app = express();
+
+// Manual Security Headers (Replacement for Helmet)
+app.use((req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+  res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  
+  // Content Security Policy (CSP) - Specifically configured to allow Stripe and local/external images
+  res.setHeader('Content-Security-Policy', [
+    "default-src 'self'",
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com",
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+    "img-src 'self' data: https: http: blob:",
+    "font-src 'self' https://fonts.gstatic.com data:",
+    "connect-src 'self' https://api.stripe.com https://*.stripe.com",
+    "frame-src 'self' https://js.stripe.com https://hooks.stripe.com",
+    "object-src 'none'",
+    "base-uri 'self'",
+    "form-action 'self'",
+    "manifest-src 'self'"
+  ].join('; '));
+  
+  next();
+});
+
 app.use(morgan('dev'));
 const port = process.env.PORT || 5000;
 const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-change-me';
@@ -33,6 +60,10 @@ app.use(cors({
   credentials: false
 }));
 app.use(express.json());
+
+app.get('/api/config/stripe-key', (req, res) => {
+  res.json({ publishableKey: process.env.STRIPE_PUBLISHABLE_KEY || process.env.REACT_APP_STRIPE_KEY });
+});
 
 // Helper to resolve asset paths (checks current dir first, then parent)
 const getAssetPath = (...segments) => {
