@@ -36,14 +36,14 @@ app.use((req, res, next) => {
   res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
   
-  // Content Security Policy (CSP) - Simplified to ensure Stripe and API connections work
+  // Content Security Policy (CSP) - Comprehensive policy for Railway, Resend, MongoDB, Vercel, and Stripe
   res.setHeader('Content-Security-Policy', [
     "default-src 'self'",
-    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://challenges.cloudflare.com",
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://challenges.cloudflare.com https://*.vercel.app",
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://challenges.cloudflare.com",
-    "img-src 'self' data: https: http: blob: https://*.stripe.com https://*.cloudinary.com",
+    "img-src 'self' data: https: http: blob: https://*.stripe.com https://*.cloudinary.com https://*.vercel.app",
     "font-src 'self' https://fonts.gstatic.com data:",
-    "connect-src 'self' https: http: https://api.stripe.com https://*.stripe.com https://*.resend.com",
+    "connect-src 'self' https: http: https://mernapp-production-3fbc.up.railway.app https://api.stripe.com https://*.stripe.com https://*.resend.com https://*.mongodb.net https://*.vercel.app",
     "frame-src 'self' https://js.stripe.com https://hooks.stripe.com https://challenges.cloudflare.com",
     "object-src 'none'",
     "base-uri 'self'",
