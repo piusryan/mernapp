@@ -71,15 +71,15 @@ function App() {
                 resolve(null)
               }
             }
-          }, () => {}, { enableHighAccuracy: true, timeout: 90000, maximumAge: 0 })
-          setTimeout(() => { if (!done) resolve(null) }, 30000)
+          }, () => {}, { enableHighAccuracy: true, timeout: 180000, maximumAge: 0 })
+          setTimeout(() => { if (!done) resolve(null) }, 60000)
         })
         try { if (watchId != null) navigator.geolocation.clearWatch(watchId) } catch {}
         
         // Fallback to single shot if watch timed out without result
         if (!best) {
           try {
-            const pos = await new Promise((res, rej) => navigator.geolocation.getCurrentPosition(res, rej, { enableHighAccuracy: false, timeout: 15000 }))
+            const pos = await new Promise((res, rej) => navigator.geolocation.getCurrentPosition(res, rej, { enableHighAccuracy: false, timeout: 30000 }))
             best = { lat: pos.coords.latitude, lon: pos.coords.longitude, accuracy: pos.coords.accuracy }
           } catch {}
         }

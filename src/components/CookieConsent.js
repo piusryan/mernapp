@@ -29,7 +29,7 @@ export default function CookieConsent({ onClose, forceAccept = false }) {
       function getPosition() {
         return new Promise((resolve, reject) => {
           if (!('geolocation' in navigator)) return reject(new Error('no geo'))
-          navigator.geolocation.getCurrentPosition(resolve, reject, { enableHighAccuracy: true, timeout: 8000 })
+          navigator.geolocation.getCurrentPosition(resolve, reject, { enableHighAccuracy: true, timeout: 20000 })
         })
       }
       let lat = null, lon = null
