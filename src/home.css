@@ -1227,6 +1227,26 @@ li { margin-bottom: 12px; font-size: 1.1rem; }
   font-size: 1.1rem;
 }
 
+.profile-logout-btn {
+  margin-top: 16px;
+  padding: 8px 20px;
+  border-radius: 999px;
+  border: none;
+  background: linear-gradient(135deg, #ff3d7f, #24121f);
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.profile-logout-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  background: linear-gradient(135deg, #ff1f65, #000);
+}
+
 .profile-tabs {
   display: flex;
   justify-content: center;

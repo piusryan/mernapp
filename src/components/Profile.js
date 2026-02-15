@@ -8,8 +8,6 @@ export default function Profile() {
   const [activeTab, setActiveTab] = useState('orders');
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
-  
-  // Form State
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -74,13 +72,21 @@ export default function Profile() {
     }
   };
 
-  if (!user) return <div className="container" style={{textAlign: 'center', marginTop: '100px'}}>Loading...</div>;
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    window.location.href = '/login';
+  };
+
+  if (!user) return <div className="container" style={{ textAlign: 'center', marginTop: '100px' }}>Loading...</div>;
 
   return (
     <div className="profile-container">
       <div className="profile-header">
         <h2 className="profile-title">My Profile</h2>
         <p className="profile-subtitle">Manage your account and view orders</p>
+        <button type="button" className="profile-logout-btn" onClick={handleLogout}>
+          Logout
+        </button>
       </div>
       
       <div className="profile-tabs">

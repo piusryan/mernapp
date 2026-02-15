@@ -9,6 +9,7 @@ export default function Cart() {
   const [error, setError] = useState('')
   const [latest, setLatest] = useState(null)
   const [notifyEnabled, setNotifyEnabled] = useState(false)
+  const [locationAllowed, setLocationAllowed] = useState(false)
   const navigate = useNavigate()
   const location = useLocation()
 
@@ -59,7 +60,35 @@ export default function Cart() {
     return () => { if (timer) clearInterval(timer) }
   }, [token, notifyEnabled, latest])
 
+  useEffect(() => {
+    if (!token) return
+    let cancelled = false
+    const acceptedLocal = localStorage.getItem('cookiesAccepted') === 'true'
+    if (acceptedLocal) {
+      setLocationAllowed(true)
+    }
+    fetch(`${API_BASE}/api/auth/me`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+      .then((r) => {
+        if (!r.ok) return null
+        return r.json()
+      })
+      .then((data) => {
+        if (!data || cancelled) return
+        const hasLocation = data.location && (data.location.lat != null || data.location.lon != null)
+        const allowed = Boolean(data.cookiesAccepted) || hasLocation
+        setLocationAllowed(allowed)
+      })
+      .catch(() => {})
+    return () => {
+      cancelled = true
+    }
+  }, [token])
+
   const total = (cart.items || []).reduce((sum, i) => sum + i.price * i.quantity, 0)
+  const itemsCount = (cart.items || []).length
+  const canCheckout = itemsCount > 0 && locationAllowed
 
   // checkout function removed in favor of Stripe payment flow
 
@@ -192,10 +221,15 @@ export default function Cart() {
                   <button 
                     className="aj-checkout-btn" 
                     onClick={() => navigate('/payment')}
-                    disabled={cart.items.length === 0}
+                    disabled={!canCheckout}
                   >
                     Checkout Now
                   </button>
+                  {!locationAllowed && (
+                    <div style={{ marginTop: 8, fontSize: 12, color: '#b00020' }}>
+                      To continue, please allow location access when prompted so we can deliver to you.
+                    </div>
+                  )}
                 </div>
               )}
 
