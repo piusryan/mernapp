@@ -80,7 +80,7 @@ export default function Profile() {
   if (!user) return <div className="container" style={{ textAlign: 'center', marginTop: '100px' }}>Loading...</div>;
 
   const hasLocation = user && user.location && (user.location.lat != null || user.location.lon != null);
-  const locationEnabled = Boolean(user.cookiesAccepted) || hasLocation;
+  const locationEnabled = Boolean(hasLocation);
 
   return (
     <div className="profile-container">
