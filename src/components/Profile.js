@@ -79,11 +79,20 @@ export default function Profile() {
 
   if (!user) return <div className="container" style={{ textAlign: 'center', marginTop: '100px' }}>Loading...</div>;
 
+  const hasLocation = user && user.location && (user.location.lat != null || user.location.lon != null);
+  const locationEnabled = Boolean(user.cookiesAccepted) || hasLocation;
+
   return (
     <div className="profile-container">
       <div className="profile-header">
         <h2 className="profile-title">My Profile</h2>
         <p className="profile-subtitle">Manage your account and view orders</p>
+        <div className="profile-location-indicator">
+          <span className={`profile-location-dot ${locationEnabled ? 'on' : 'off'}`} />
+          <span className="profile-location-text">
+            {locationEnabled ? 'Location sharing enabled for delivery and live tracking' : 'Location not enabled yet. Please allow location when prompted.'}
+          </span>
+        </div>
         <button type="button" className="profile-logout-btn" onClick={handleLogout}>
           Logout
         </button>
