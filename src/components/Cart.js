@@ -63,10 +63,6 @@ export default function Cart() {
   useEffect(() => {
     if (!token) return
     let cancelled = false
-    const acceptedLocal = localStorage.getItem('cookiesAccepted') === 'true'
-    if (acceptedLocal) {
-      setLocationAllowed(true)
-    }
     fetch(`${API_BASE}/api/auth/me`, {
       headers: { Authorization: `Bearer ${token}` }
     })
@@ -77,8 +73,7 @@ export default function Cart() {
       .then((data) => {
         if (!data || cancelled) return
         const hasLocation = data.location && (data.location.lat != null || data.location.lon != null)
-        const allowed = Boolean(data.cookiesAccepted) || hasLocation
-        setLocationAllowed(allowed)
+        setLocationAllowed(Boolean(hasLocation))
       })
       .catch(() => {})
     return () => {

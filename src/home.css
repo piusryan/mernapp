@@ -1227,6 +1227,39 @@ li { margin-bottom: 12px; font-size: 1.1rem; }
   font-size: 1.1rem;
 }
 
+.profile-location-indicator {
+  margin-top: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.profile-location-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+}
+
+.profile-location-dot.on {
+  background: #0a7;
+  border-color: #0a7;
+}
+
+.profile-location-dot.off {
+  background: #f5c6cb;
+  border-color: #e3342f;
+}
+
+.profile-location-text {
+  font-size: 0.85rem;
+  color: #444;
+}
+
 .profile-logout-btn {
   margin-top: 16px;
   padding: 8px 20px;

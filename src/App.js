@@ -18,31 +18,16 @@ function App() {
           if (d && d.role === 'admin') {
             setOpen(false);
             setForceAccept(false);
-          } else if (d && d.cookiesAccepted) {
+            return;
+          }
+          const hasLocation = d && d.location && (d.location.lat != null || d.location.lon != null);
+          if (hasLocation) {
             localStorage.setItem('cookiesAccepted', 'true');
             setOpen(false);
             setForceAccept(false);
           } else {
-            const acceptedLocal = localStorage.getItem('cookiesAccepted') === 'true';
-            if (acceptedLocal) {
-              fetch(`${API_BASE}/api/user/location`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-                body: JSON.stringify({ cookiesAccepted: true })
-              })
-                .then(() => {
-                  localStorage.setItem('cookiesAccepted', 'true');
-                  setOpen(false);
-                  setForceAccept(false);
-                })
-                .catch(() => {
-                  setOpen(true);
-                  setForceAccept(true);
-                });
-            } else {
-              setOpen(true);
-              setForceAccept(true);
-            }
+            setOpen(true);
+            setForceAccept(true);
           }
         })
         .catch(() => { setOpen(true); setForceAccept(true) });

@@ -37,7 +37,11 @@ export default function CookieConsent({ onClose, forceAccept = false }) {
         const pos = await getPosition()
         lat = pos.coords.latitude
         lon = pos.coords.longitude
-      } catch {}
+      } catch (e) {
+        setBusy(false)
+        setError('Location access is required. Please allow location in your browser and try again.')
+        return
+      }
       const landmark = (lat != null && lon != null) ? (await reverse(lat, lon)) : ''
       await fetch(`${API_BASE}/api/user/location`, {
         method: 'POST',
