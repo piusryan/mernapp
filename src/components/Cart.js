@@ -220,7 +220,6 @@ export default function Cart() {
                   >
                     Checkout Now
                   </button>
-                  
                   {!locationAllowed && (
                     <div style={{ marginTop: 8, fontSize: 12, color: '#b00020' }}>
                       To continue, please allow location access when prompted so we can deliver to you.
