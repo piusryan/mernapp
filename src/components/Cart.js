@@ -220,6 +220,14 @@ export default function Cart() {
                   >
                     Checkout Now
                   </button>
+                  <button 
+                    className="aj-checkout-btn" 
+                    style={{ marginLeft: 8, background: '#5b2', borderColor: '#5b2' }}
+                    onClick={() => navigate('/phonepe')}
+                    disabled={!canCheckout}
+                  >
+                    Pay with PhonePe
+                  </button>
                   {!locationAllowed && (
                     <div style={{ marginTop: 8, fontSize: 12, color: '#b00020' }}>
                       To continue, please allow location access when prompted so we can deliver to you.
