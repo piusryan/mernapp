@@ -129,6 +129,12 @@ export default function Payment() {
           {!stripeInstance && <p style={{ fontSize: '0.8em', color: '#666' }}>Loading payment secure module...</p>}
         </div>
       )}
+      <div style={{ marginTop: 24, textAlign: 'center' }}>
+        <div style={{ fontSize: 12, color: '#666', marginBottom: 8 }}>Prefer UPI/NetBanking?</div>
+        <button className="btn-modern" style={{ background: '#5b2', borderColor: '#5b2' }} onClick={()=>navigate('/phonepe')}>
+          Pay with PhonePe
+        </button>
+      </div>
     </div>
   );
 }
