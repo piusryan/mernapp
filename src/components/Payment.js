@@ -69,6 +69,7 @@ function CheckoutForm() {
 export default function Payment() {
   const [clientSecret, setClientSecret] = useState("");
   const [stripeInstance, setStripeInstance] = useState(null);
+  const [method, setMethod] = useState(null); // 'stripe' | 'phonepe' | null
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -117,24 +118,48 @@ export default function Payment() {
 
   return (
     <div className="container" style={{ padding: '40px 20px', maxWidth: 600, margin: '0 auto' }}>
-      <h2 style={{ textAlign: 'center', marginBottom: 30 }}>Complete Payment</h2>
-      {clientSecret && stripeInstance ? (
-        <Elements options={options} stripe={stripeInstance}>
-          <CheckoutForm />
-        </Elements>
-      ) : (
-        <div style={{ textAlign: 'center' }}>
-          <p>Loading payment details...</p>
-          {!clientSecret && <p style={{ fontSize: '0.8em', color: '#666' }}>Initializing transaction...</p>}
-          {!stripeInstance && <p style={{ fontSize: '0.8em', color: '#666' }}>Loading payment secure module...</p>}
-        </div>
-      )}
-      <div style={{ marginTop: 24, textAlign: 'center' }}>
-        <div style={{ fontSize: 12, color: '#666', marginBottom: 8 }}>Prefer UPI/NetBanking?</div>
-        <button className="btn-modern" style={{ background: '#5b2', borderColor: '#5b2' }} onClick={()=>navigate('/phonepe')}>
+      <h2 style={{ textAlign: 'center', marginBottom: 16 }}>Complete Payment</h2>
+      
+      <div style={{ display:'flex', gap:12, justifyContent:'center', marginBottom:20 }}>
+        <button 
+          className="btn-modern" 
+          style={{ background: method === 'stripe' ? '#0a7' : '#ddd', color: method === 'stripe' ? '#fff' : '#333' }} 
+          onClick={()=>setMethod('stripe')}
+        >
+          Checkout with Stripe
+        </button>
+        <button 
+          className="btn-modern" 
+          style={{ background: method === 'phonepe' ? '#5b2' : '#ddd', color: method === 'phonepe' ? '#fff' : '#333' }} 
+          onClick={()=>setMethod('phonepe')}
+        >
           Pay with PhonePe
         </button>
       </div>
+
+      {method === 'phonepe' && (
+        <div style={{ textAlign:'center', marginTop: 12 }}>
+          <button className="btn-modern" style={{ background:'#5b2', borderColor:'#5b2' }} onClick={()=>navigate('/phonepe')}>
+            Continue to PhonePe
+          </button>
+        </div>
+      )}
+
+      {method !== 'phonepe' && (
+        <>
+          {clientSecret && stripeInstance ? (
+            <Elements options={options} stripe={stripeInstance}>
+              <CheckoutForm />
+            </Elements>
+          ) : (
+            <div style={{ textAlign: 'center' }}>
+              <p>Loading payment details...</p>
+              {!clientSecret && <p style={{ fontSize: '0.8em', color: '#666' }}>Initializing transaction...</p>}
+              {!stripeInstance && <p style={{ fontSize: '0.8em', color: '#666' }}>Loading payment secure module...</p>}
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 }
