@@ -5,8 +5,6 @@ import Login from './Login';
 import Items from './Items';
 import Cart from './Cart';
 import Payment from './Payment';
-import PhonePe from './PhonePe';
-import PhonePeReturn from './PhonePeReturn';
 import Home from './Home';
 import AdminDashboard from './AdminDashboard';
 import Track from './Track';
@@ -41,8 +39,6 @@ export default function AnimatedRoutes() {
         <Route path="/wishlist" element={<PageLayout><Wishlist /></PageLayout>} />
         <Route path="/profile" element={<PageLayout><Profile /></PageLayout>} />
         <Route path="/payment" element={<PageLayout><Payment /></PageLayout>} />
-        <Route path="/phonepe" element={<PageLayout><PhonePe /></PageLayout>} />
-        <Route path="/phonepe/return" element={<PageLayout><PhonePeReturn /></PageLayout>} />
         <Route path="/admin" element={<PageLayout><AdminDashboard /></PageLayout>} />
         <Route path="/track" element={<PageLayout><Track /></PageLayout>} />
       </Routes>

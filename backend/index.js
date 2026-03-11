@@ -80,31 +80,7 @@ app.get('/api/config/stripe-key', (req, res) => {
   res.json({ publishableKey: process.env.STRIPE_PUBLISHABLE_KEY || process.env.REACT_APP_STRIPE_KEY });
 });
 
-let phonepeToken = null
-let phonepeTokenExpiresAt = 0
-async function getPhonePeToken() {
-  const now = Date.now()
-  if (phonepeToken && phonepeTokenExpiresAt - now > 60000) return phonepeToken
-  const clientId = process.env.PHONEPE_CLIENT_ID
-  const clientSecret = process.env.PHONEPE_CLIENT_SECRET
-  const clientVersion = process.env.PHONEPE_CLIENT_VERSION || '1'
-  if (!clientId || !clientSecret) throw new Error('PhonePe credentials missing')
-  const body = new URLSearchParams()
-  body.append('client_id', clientId)
-  body.append('client_version', String(clientVersion))
-  body.append('client_secret', clientSecret)
-  body.append('grant_type', 'client_credentials')
-  const url = process.env.PHONEPE_ENV === 'prod'
-    ? 'https://api.phonepe.com/apis/identity-manager/v1/oauth/token'
-    : 'https://api-preprod.phonepe.com/apis/pg-sandbox/v1/oauth/token'
-  const r = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body })
-  if (!r.ok) throw new Error('PhonePe auth failed')
-  const data = await r.json()
-  phonepeToken = data && (data.access_token || data.encrypted_access_token)
-  const exp = data && (data.expires_at || data.session_expires_at)
-  phonepeTokenExpiresAt = exp ? Number(exp) * 1000 : now + 30 * 60 * 1000
-  return phonepeToken
-}
+ 
 
 // Helper to resolve asset paths (checks current dir first, then parent)
 const getAssetPath = (...segments) => {
@@ -625,58 +601,7 @@ app.post('/api/create-payment-intent', authMiddleware, async (req, res) => {
   }
 });
 
-app.post('/api/phonepe/pay', authMiddleware, async (req, res) => {
-  try {
-    const cart = await Cart.findOne({ userId: req.userId });
-    if (!cart || cart.items.length === 0) return res.status(400).json({ error: 'Cart is empty' });
-    const amount = Math.round(cart.items.reduce((s, i) => s + i.price * i.quantity, 0) * 100);
-    const merchantOrderId = `ORDER_${Date.now()}`;
-    const token = await getPhonePeToken();
-    const base = process.env.PHONEPE_ENV === 'prod'
-      ? 'https://api.phonepe.com/apis/pg'
-      : 'https://api-preprod.phonepe.com/apis/pg-sandbox';
-    const redirectUrl = `${FRONTEND_ORIGIN.replace(/\/+$/,'')}/phonepe/return?orderId=${encodeURIComponent(merchantOrderId)}`;
-    const body = {
-      merchantOrderId,
-      amount,
-      paymentFlow: {
-        type: 'PG_CHECKOUT',
-        message: 'Order payment',
-        merchantUrls: { redirectUrl }
-      }
-    };
-    const r = await fetch(`${base}/checkout/v2/pay`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `O-Bearer ${token}` },
-      body: JSON.stringify(body)
-    });
-    const data = await r.json();
-    if (!r.ok) return res.status(500).json({ error: data && data.message ? data.message : 'PhonePe pay failed' });
-    const redirect = (data && data.paymentFlow && data.paymentFlow.merchantUrls && data.paymentFlow.merchantUrls.redirectUrl) || (data && data.redirectUrl) || (data && data.data && data.data.redirectUrl);
-    res.json({ redirectUrl: redirect || redirectUrl, merchantOrderId });
-  } catch (e) {
-    res.status(500).json({ error: 'Failed to initiate PhonePe payment' });
-  }
-});
-
-app.get('/api/phonepe/order/:orderId/status', authMiddleware, async (req, res) => {
-  try {
-    const orderId = req.params.orderId;
-    if (!orderId) return res.status(400).json({ error: 'orderId required' });
-    const token = await getPhonePeToken();
-    const base = process.env.PHONEPE_ENV === 'prod'
-      ? 'https://api.phonepe.com/apis/pg'
-      : 'https://api-preprod.phonepe.com/apis/pg-sandbox';
-    const r = await fetch(`${base}/checkout/v2/order/${encodeURIComponent(orderId)}/status`, {
-      headers: { 'Authorization': `O-Bearer ${token}` }
-    });
-    const data = await r.json();
-    if (!r.ok) return res.status(500).json({ error: data && data.message ? data.message : 'PhonePe status failed' });
-    res.json(data);
-  } catch (e) {
-    res.status(500).json({ error: 'Failed to fetch status' });
-  }
-});
+ 
 
 app.post('/api/cart/checkout', authMiddleware, async (req, res) => {
   try {

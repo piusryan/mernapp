@@ -83,7 +83,7 @@ export default function Cart() {
 
   const total = (cart.items || []).reduce((sum, i) => sum + i.price * i.quantity, 0)
   const itemsCount = (cart.items || []).length
-  const canCheckout = itemsCount > 0
+  const canCheckout = itemsCount > 0 && locationAllowed
 
   // checkout function removed in favor of Stripe payment flow
 
@@ -220,14 +220,7 @@ export default function Cart() {
                   >
                     Checkout Now
                   </button>
-                  <button 
-                    className="aj-checkout-btn" 
-                    style={{ width: '100%', marginTop: 8, background: '#5b2', borderColor: '#5b2' }}
-                    onClick={() => navigate('/phonepe')}
-                    disabled={!canCheckout}
-                  >
-                    Pay with PhonePe
-                  </button>
+                  
                   {!locationAllowed && (
                     <div style={{ marginTop: 8, fontSize: 12, color: '#b00020' }}>
                       To continue, please allow location access when prompted so we can deliver to you.
