@@ -160,6 +160,13 @@ export default function Payment() {
           )}
         </>
       )}
+      
+      <div style={{ marginTop: 24, textAlign: 'center' }}>
+        <div style={{ fontSize: 12, color: '#666', marginBottom: 8 }}>Alternative</div>
+        <button className="btn-modern" style={{ width: '100%', background:'#5b2', borderColor:'#5b2' }} onClick={()=>navigate('/phonepe')}>
+          Pay with PhonePe
+        </button>
+      </div>
     </div>
   );
 }

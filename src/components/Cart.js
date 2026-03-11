@@ -222,7 +222,7 @@ export default function Cart() {
                   </button>
                   <button 
                     className="aj-checkout-btn" 
-                    style={{ marginLeft: 8, background: '#5b2', borderColor: '#5b2' }}
+                    style={{ width: '100%', marginTop: 8, background: '#5b2', borderColor: '#5b2' }}
                     onClick={() => navigate('/phonepe')}
                     disabled={!canCheckout}
                   >
