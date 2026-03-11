@@ -58,7 +58,7 @@ function CheckoutForm() {
       <PaymentElement />
       <button disabled={isLoading || !stripe || !elements} id="submit" className="btn-modern" style={{ marginTop: 20, width: '100%', background: '#0a7' }}>
         <span id="button-text">
-          {isLoading ? "Processing..." : "Pay Now"}
+          {isLoading ? "Processing..." : "Checkout Now with Stripe"}
         </span>
       </button>
       {message && <div id="payment-message" style={{ color: 'red', marginTop: 10 }}>{message}</div>}
