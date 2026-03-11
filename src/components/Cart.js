@@ -83,7 +83,7 @@ export default function Cart() {
 
   const total = (cart.items || []).reduce((sum, i) => sum + i.price * i.quantity, 0)
   const itemsCount = (cart.items || []).length
-  const canCheckout = itemsCount > 0 && locationAllowed
+  const canCheckout = itemsCount > 0
 
   // checkout function removed in favor of Stripe payment flow
 
